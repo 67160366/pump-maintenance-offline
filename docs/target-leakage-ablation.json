@@ -1,0 +1,34 @@
+{
+  "method": "Fresh sklearn training; no execution of archive Python or unpickling archive models. Same 80/20 split seed42 stratification and RF parameters as archive; scaler fit train only.",
+  "original_csv_sha256_matches": true,
+  "current_formula_reproduces_processed_csv": true,
+  "labels_unchanged": true,
+  "results": [
+    {
+      "variant": "Archive target-derived Current",
+      "accuracy": 0.8735,
+      "precision": 0.850612629594722,
+      "recall": 0.9052156469408225,
+      "f1": 0.8770651117589893,
+      "roc_auc": 0.9459055131496183
+    },
+    {
+      "variant": "Same formula without Maintenance_Flag term",
+      "accuracy": 0.51475,
+      "precision": 0.5138092756644086,
+      "recall": 0.4944834503510532,
+      "f1": 0.5039611551239458,
+      "roc_auc": 0.5118494816453347
+    },
+    {
+      "variant": "Original Vibration + Temperature",
+      "accuracy": 0.4985,
+      "roc_auc": 0.49409919689277204
+    },
+    {
+      "variant": "Original six sensors",
+      "accuracy": 0.48475,
+      "roc_auc": 0.4752880275922483
+    }
+  ]
+}
