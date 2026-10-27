@@ -1,3 +1,4 @@
+# Local environments, caches and secrets
 .venv/
 __pycache__/
 *.py[cod]
@@ -6,19 +7,38 @@ __pycache__/
 !.env.example
 *.pem
 *.key
-data/
 models/
-artifacts/
-ai4i-artifacts/
-experiments/
 reviews/
-wheels/
+# Ignore unapproved data; these two public datasets and notices are versioned.
+/data/*
+!/data/README.md
+!/data/sources.json
+!/data/licenses/
+!/data/ai4i/
+!/data/Large_Industrial_Pump_Maintenance_Dataset.csv
+/data/ai4i/*
+!/data/ai4i/ai4i2020.csv
+# Generated model files are ignored unless explicitly approved below.
 *.joblib
+!/artifacts/model.joblib
+!/ai4i-artifacts/ordered_primary/model.joblib
+!/ai4i-artifacts/random_secondary/model.joblib
+!/experiments/candidate.joblib
+!/runtime/model.joblib
 *.pkl
 *.gguf
+# Only the Linux ARM64 / Python 3.12 wheel set is shipped.
+/wheels/*
+!/wheels/README.md
+!/wheels/pi4-cp312/
+/wheels/pi4-cp312/*
+!/wheels/pi4-cp312/*.whl
+# Rebuildable archives and local execution output stay outside Git history.
 *.zip
 *.log
 *.jsonl
 benchmark*.json
 *-results.txt
 requirements-lock.txt
+pi-release*/
+evidence/

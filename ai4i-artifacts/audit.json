@@ -1,0 +1,44 @@
+{
+  "rows": 10000,
+  "columns": [
+    "UDI",
+    "Product ID",
+    "Type",
+    "Air temperature [K]",
+    "Process temperature [K]",
+    "Rotational speed [rpm]",
+    "Torque [Nm]",
+    "Tool wear [min]",
+    "Machine failure",
+    "TWF",
+    "HDF",
+    "PWF",
+    "OSF",
+    "RNF"
+  ],
+  "missing": {
+    "UDI": 0,
+    "Product ID": 0,
+    "Type": 0,
+    "Air temperature [K]": 0,
+    "Process temperature [K]": 0,
+    "Rotational speed [rpm]": 0,
+    "Torque [Nm]": 0,
+    "Tool wear [min]": 0,
+    "Machine failure": 0,
+    "TWF": 0,
+    "HDF": 0,
+    "PWF": 0,
+    "OSF": 0,
+    "RNF": 0
+  },
+  "target_counts": {
+    "0": 9661,
+    "1": 339
+  },
+  "input_duplicates": 0,
+  "source": "https://archive.ics.uci.edu/dataset/601/ai4i+2020+predictive+maintenance+dataset",
+  "license": "CC BY 4.0",
+  "sha256": "dc6630cd9b1f0f853922fad78a1b6436570d3f1ec863f1dd5c4340ac56bc8a8e",
+  "note": "Ordered split uses source row order, not actual timestamps or independent machine identities."
+}

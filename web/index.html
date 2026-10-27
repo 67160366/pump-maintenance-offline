@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pump Lab · Offline maintenance</title><link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+<div class="shell">
+  <header><a class="brand" href="/" aria-label="Pump Lab home"><span class="brand-mark">P</span><span>PUMP LAB<small>MAINTENANCE / EDGE DEMO</small></span></a><div class="connection"><span id="connection-dot" class="dot"></span><span id="connection">กำลังเชื่อมต่อเครื่อง</span></div></header>
+  <main>
+    <section class="intro"><div><p class="eyebrow">RASPBERRY PI 4 · LOCAL INFERENCE</p><h1>มองเห็นทุกขั้นตอน<br><span>ก่อนตัดสินใจดูแลเครื่องจักร</span></h1><p class="description">ค่าที่วัด → ผลจากโมเดล → ข้อความสรุปไทย ในเครื่องเดียว</p></div><div class="mode-card"><span class="tiny">แหล่งข้อมูลเดโม</span><strong id="dataset">—</strong><span>CSV replay • ไม่ใช่เซนเซอร์สด</span><span id="llm-config">กำลังอ่านการตั้งค่า</span></div></section>
+    <div class="notice" id="warning">กำลังโหลดข้อมูลระบบ…</div>
+    <section class="toolbar" aria-label="ควบคุมเดโม"><div class="buttons"><button id="start" class="primary">▶ เล่นอัตโนมัติ</button><button id="pause">หยุดพัก</button><button id="step">อ่านแถวถัดไป →</button><button id="reset" class="quiet">เริ่มใหม่</button></div><div><span id="run-state">พร้อมเริ่ม</span><span class="divider">/</span><span id="position">0 / 0 แถว</span></div></section>
+    <p id="error" class="error" role="alert" hidden></p>
+    <section class="pipeline" aria-label="เส้นทางข้อมูล">
+      <div id="stage-input"><span>01</span><strong>รับค่าจาก CSV</strong><small>ตรวจชื่อคอลัมน์และค่าที่วัด</small></div><b aria-hidden="true">→</b>
+      <div id="stage-model"><span>02</span><strong>โมเดล ML</strong><small>คำนวณคะแนนและสถานะ</small></div><b aria-hidden="true">→</b>
+      <div id="stage-bridge"><span>03</span><strong>ตัวกลาง Python</strong><small>จัดข้อเท็จจริง + ตรวจคำตอบ</small></div><b aria-hidden="true">→</b>
+      <div id="stage-summary"><span>04</span><strong>สรุปภาษาไทย</strong><small id="summary-stage">Template / LLM ในเครื่อง</small></div>
+    </section>
+    <div class="workspace">
+      <section class="panel sensors"><div class="panel-heading"><span class="eyebrow">INPUT SNAPSHOT</span><span id="row-number" class="tag">รอข้อมูล</span></div><h2>ค่าที่วัด</h2><div id="readings" class="reading-list"><p class="muted">กดอ่านแถวถัดไปเพื่อเริ่มเดโม</p></div><p class="footnote" id="sensor-note">หน่วยแสดงตามชุดข้อมูล</p></section>
+      <section class="panel result"><div class="panel-heading"><span class="eyebrow">CLASSIFIER OUTPUT</span><span class="tag">ML ตัดสินสถานะ</span></div><h2>ผลประเมินจากโมเดล</h2><div id="status" class="status idle" aria-live="polite">รอประมวลผล</div><div class="score-line"><strong id="score">—</strong><span>คะแนนโมเดล<br><small>ไม่ใช่โอกาสเสียที่ยืนยันแล้ว</small></span></div><progress id="score-bar" value="0" max="1" aria-label="คะแนนโมเดล"></progress><div class="score-meta"><span>Threshold <b id="threshold">—</b></span><span id="inference-time">— ms</span></div><div class="chart-heading"><h3>คะแนนตามลำดับ replay</h3><span>0–1</span></div><svg id="chart" viewBox="0 0 400 100" role="img" aria-label="ประวัติคะแนนโมเดลและเส้น threshold"></svg><p class="footnote">ลำดับแถวเดโม ไม่ใช่แนวโน้มตามเวลาจริง</p></section>
+      <section class="panel summary"><div class="panel-heading"><span class="eyebrow">THAI SUMMARY</span><span id="summary-method" class="tag">ยังไม่มีสรุป</span></div><h2>สรุปเพื่อช่วยอ่านผล</h2><p class="summary-description">ตัวเลขและสถานะมาจากโมเดล<br>LLM เลือกข้อความที่ผ่านการตรวจสอบ</p><div id="summary" class="summary-text" aria-live="polite">เมื่ออ่านข้อมูล ระบบจะแสดงข้อเท็จจริงและข้อความไทยที่นี่</div><div class="summary-footer"><span id="llm-time">เวลา LLM —</span><span>Fallback พร้อมใช้งาน</span></div></section>
+    </div>
+    <section class="bottom-grid"><div class="panel history"><div class="section-heading"><h2>ประวัติการทำงาน</h2><a href="/api/export" download="demo-session.json">บันทึกผล JSON ↗</a></div><div class="table-scroll"><table><thead><tr><th>แถว</th><th>สถานะ</th><th>คะแนน</th><th>ML</th><th>วิธีสรุป</th></tr></thead><tbody id="history"><tr><td colspan="5" class="muted">ยังไม่มีผลประเมิน</td></tr></tbody></table></div></div><div class="panel machine"><span class="eyebrow">DEVICE / RUNTIME</span><h2>เครื่องที่กำลังรัน</h2><dl><div><dt>สถาปัตยกรรม</dt><dd id="machine">—</dd></div><div><dt>RAM โปรแกรม + LLM</dt><dd id="rss">—</dd></div><div><dt>RAM ระบบทั้งหมด</dt><dd id="system-memory">—</dd></div><div><dt>อุณหภูมิ CPU</dt><dd id="temperature">—</dd></div></dl><p class="footnote">ค่าขณะนี้ ไม่ใช่ peak benchmark<br>ยังไม่ยืนยันการตรวจรับฮาร์ดแวร์ Pi</p></div></section>
+    <details class="technical"><summary>ดูข้อมูลที่ตัวกลางจัดให้ระบบสรุป และข้อมูลโมเดล</summary><p>สถานะและตัวเลขถูกจัดเป็นข้อเท็จจริง ก่อนสร้าง prompt ให้ LLM เลือก A/B หากคำตอบผิดรูปแบบ ขัดกับสถานะ หรือเกิน 30 วินาที ระบบใช้ template</p><pre id="handoff">ยังไม่มีข้อมูล</pre><pre id="model-info"></pre></details>
+  </main><footer><span>PUMP LAB / OFFLINE DEMONSTRATOR</span><span>Snapshot classification · ไม่ระบุสาเหตุยืนยันหรือเวลาที่จะเสีย</span></footer>
+</div>
+</body></html>

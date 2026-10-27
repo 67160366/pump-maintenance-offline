@@ -1,0 +1,21 @@
+{
+  "selection": "Up to six predicted normal + six predicted alert test snapshots, interleaved; curated demo, not evaluation.",
+  "original_row_indices": [
+    8000,
+    8003,
+    8001,
+    8026,
+    8002,
+    8192,
+    8004,
+    8195,
+    8005,
+    8245,
+    8006,
+    8277
+  ],
+  "source_sha256": "dc6630cd9b1f0f853922fad78a1b6436570d3f1ec863f1dd5c4340ac56bc8a8e",
+  "source": "https://archive.ics.uci.edu/dataset/601/ai4i+2020+predictive+maintenance+dataset",
+  "license": "CC BY 4.0",
+  "credit": "AI4I 2020 Predictive Maintenance Dataset, UCI Machine Learning Repository; DOI 10.24432/C5HS5C"
+}

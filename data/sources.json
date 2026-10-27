@@ -1,0 +1,24 @@
+{
+  "verified_at": "2026-10-27T05:17:38.285267+00:00",
+  "datasets": [
+    {
+      "path": "data/ai4i/ai4i2020.csv",
+      "source": "https://archive.ics.uci.edu/dataset/601/ai4i+2020+predictive+maintenance+dataset",
+      "doi": "10.24432/C5HS5C",
+      "license": "CC BY 4.0",
+      "sha256": "dc6630cd9b1f0f853922fad78a1b6436570d3f1ec863f1dd5c4340ac56bc8a8e",
+      "bytes": 522048
+    },
+    {
+      "path": "data/Large_Industrial_Pump_Maintenance_Dataset.csv",
+      "source": "https://www.kaggle.com/datasets/selonamaris/large-industrial-pump-maintenance-dataset",
+      "license": "MIT",
+      "owner": "Selona Maris",
+      "version": 1,
+      "license_metadata_url": "https://www.kaggle.com/api/v1/datasets/view/selonamaris/large-industrial-pump-maintenance-dataset",
+      "upstream_last_updated": "2024-10-03T19:39:17.257Z",
+      "sha256": "09ef5f98b5aad059de3104920a22878e94f13f44c8df80ab90db148736c71931",
+      "bytes": 2296784
+    }
+  ]
+}

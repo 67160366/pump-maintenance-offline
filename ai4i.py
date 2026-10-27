@@ -164,6 +164,13 @@ def train(args):
     print(json.dumps([dict(split=r['split'],selected=r['selected'],test=r['test']) for r in reports],indent=2))
 
 
+def summary_text(row, s, state):
+    return ('สถานะ: '+('ควรตรวจบำรุงรักษา' if state else 'ยังไม่พบสัญญาณเครื่องเสียจากโมเดล')+
+            f'\nคะแนนโมเดล: {s:.4f} (ยังไม่ใช่โอกาสเสียที่ผ่าน calibration)'+
+            '\nค่าที่วัด: '+', '.join(f'{c}={row[c]}' for c in INPUTS)+
+            '\nเป็นผลจากข้อมูลสังเคราะห์ AI4I ไม่ระบุสาเหตุยืนยันหรือเวลาที่จะเสีย')
+
+
 def predict(args):
     bundle=joblib.load(args.model)
     if bundle['sklearn_version']!=__import__('sklearn').__version__: raise ValueError('scikit-learn version mismatch')
@@ -173,10 +180,7 @@ def predict(args):
         s=float(pump.score(bundle['model'],row[INPUTS].to_frame().T)[0])
         state=int(s>=bundle['threshold'])
         elapsed=time.perf_counter()-start
-        text=('สถานะ: '+('ควรตรวจบำรุงรักษา' if state else 'ยังไม่พบสัญญาณเครื่องเสียจากโมเดล')+
-              f'\nคะแนนโมเดล: {s:.4f} (ยังไม่ใช่โอกาสเสียที่ผ่าน calibration)'+
-              '\nค่าที่วัด: '+', '.join(f'{c}={row[c]}' for c in INPUTS)+
-              '\nเป็นผลจากข้อมูลสังเคราะห์ AI4I ไม่ระบุสาเหตุยืนยันหรือเวลาที่จะเสีย')
+        text=summary_text(row, s, state)
         summary,method,seconds=pump.summarize(args,text)
         print(json.dumps(dict(status=state,score=s,inference_seconds=elapsed,summary=summary,
                               summary_method=method,llm_seconds=seconds),ensure_ascii=False))

@@ -1,0 +1,18 @@
+{
+  "dataset": "ai4i",
+  "model": "model.joblib",
+  "csv": "demo.csv",
+  "parity_csv": "parity_inputs.csv",
+  "parity_expected": "parity_expected.json",
+  "built_at": "2026-10-27T05:17:37.858614+00:00",
+  "python": "3.12.14",
+  "python_major_minor": "3.12",
+  "pc_parity": {
+    "passed": true,
+    "rows": 20,
+    "atol": 1e-09
+  },
+  "bundled_wheels": 11,
+  "hardware_acceptance_verified": false,
+  "distribution": "Versioned runtime; source revision is the containing Git commit"
+}

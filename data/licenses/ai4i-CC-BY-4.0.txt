@@ -1,0 +1,9 @@
+AI4I 2020 Predictive Maintenance Dataset
+UCI Machine Learning Repository, DOI: https://doi.org/10.24432/C5HS5C
+Source: https://archive.ics.uci.edu/dataset/601/ai4i+2020+predictive+maintenance+dataset
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+License text: https://creativecommons.org/licenses/by/4.0/legalcode
+
+The original CSV is redistributed unchanged. Curated demo snapshots are selected
+and reordered; see runtime/demo_provenance.json for exact source row indices.
+This notice applies to the AI4I data, not to unrelated datasets or dependencies.

@@ -3,3 +3,8 @@
 *.md text eol=lf
 *.json text eol=lf
 *.txt text eol=lf
+*.csv binary
+*.joblib binary
+*.whl binary
+# Preserve exact runtime bytes so manifest hashes survive Windows/Linux checkout.
+runtime/** -text

@@ -10,6 +10,47 @@ CSV → ตรวจอินพุต → ML classifier → สถานะแ�
 
 **สถานะ:** เทรนและทดสอบบนคอมพิวเตอร์แล้ว ยังไม่ได้ยืนยันประสิทธิภาพบน Pi, LLM GGUF จริง หรือปั๊มจริง โมเดลจำแนก snapshot ไม่ทำนายเวลาที่จะเสีย
 
+## นำไปเดโมบน Pi 4 / agent เริ่มตรงนี้
+
+มีหน้า dashboard ออฟไลน์แล้ว: อ่าน CSV ทีละแถว/เล่นอัตโนมัติ แสดงเซนเซอร์ ผลโมเดล
+ตัวกลาง Python, สรุปไทย, สถานะ LLM/fallback, ประวัติ และทรัพยากรเครื่อง
+หน้าเว็บเรียกโมเดลจริงผ่าน `bridge.py` ไม่ต้องมี Node.js หรือบริการ cloud
+
+- **Agent:** อ่าน [AGENTS.md](AGENTS.md) และ [สถานะ/งานถัดไป](docs/PROJECT_STATUS.md)
+- **ย้ายไป Pi:** [ขั้นตอน PC → ZIP → Pi → offline acceptance](docs/PI_HANDOFF.md)
+- **นำเสนอ:** [บทเดโม 5–7 นาที](docs/DEMO_RUNBOOK.md)
+- **ตัวกลาง/หน้าระบบ:** [สถาปัตยกรรมและ API](docs/ARCHITECTURE.md)
+
+**Clone แล้วมีโมเดลและข้อมูลเดโมพร้อมใช้** ไม่ต้องเทรนใหม่ โดยค่าเริ่มต้นใช้ `runtime/`
+มีโมเดล AI4I primary/secondary, โมเดลปั๊มเดิม, research candidate, ข้อมูลต้นฉบับพร้อม
+ที่มา และ wheels Linux ARM64/Python 3.12 อยู่ใน Git แล้ว ดู [รายการไฟล์](docs/GIT_CONTENTS.md)
+
+บน Pi ที่มี Python 3.12 แล้ว:
+
+```bash
+git clone https://github.com/67160366/pump-maintenance-offline.git
+cd pump-maintenance-offline
+python3.12 -m venv .venv
+.venv/bin/python -m pip install --no-index --find-links wheels/pi4-cp312 -r requirements-pi.txt
+.venv/bin/python pi_check.py
+.venv/bin/python dashboard.py
+```
+
+เปิด `http://127.0.0.1:8080` หาก Pi ยังไม่มี Python 3.12 ดู [วิธีเตรียม Python](docs/PI_HANDOFF.md)
+Windows ใช้ `.venv\Scripts\python -m pip install -r requirements-pi.txt` จาก PyPI
+เพราะ wheels ที่แนบเป็น Linux ARM64 เท่านั้น
+
+ทางเลือกสร้าง ZIP สำหรับ USB transfer:
+
+```powershell
+.venv\Scripts\python prepare_pi.py --out pi-release
+.venv\Scripts\python pi_check.py --release pi-release
+.venv\Scripts\python dashboard.py --release pi-release
+```
+
+เปิด `http://127.0.0.1:8080` และส่ง `pi-release.zip` พร้อม SHA-256 ไป Pi
+ZIP ไม่รวม GGUF, llama.cpp หรือ Python environment; ARM64 wheels ใส่เพิ่มด้วย `--wheels-dir` ได้
+
 ## เริ่มจากอะไรดี
 
 แนะนำเริ่ม **AI4I 2020** เพื่อทดลอง pipeline ที่มีสัญญาณให้เรียนรู้ จากนั้นค่อยศึกษาชุดปั๊มเดิมและการทดลองฟีเจอร์เพิ่มเติม
@@ -24,32 +65,29 @@ AI4I มีเครื่องเสียเพียง 339/10,000 แถว
 
 ## ติดตั้งบน Windows
 
-ใช้ **Python 3.11 หรือ 3.12** โดย environment ที่ทดสอบจริงเป็น Python 3.12
+ใช้ **Python 3.12** ให้ตรง runtime ที่แนบมา โดย environment ที่ทดสอบจริงเป็น Python 3.12
 
 ```powershell
 git clone https://github.com/67160366/pump-maintenance-offline.git
 cd pump-maintenance-offline
 py -3.12 -m venv .venv
-.venv\Scripts\python -m pip install -r requirements.txt
+.venv\Scripts\python -m pip install -r requirements-pi.txt
 .venv\Scripts\python -m unittest -v
 ```
 
 หากไม่มี Python Launcher ให้ใช้ `python -m venv .venv` แทน ตรวจว่า Python เป็นรุ่นที่รองรับ
 
-## ลอง AI4I ภายใน 3 ขั้นตอน
+## ลอง AI4I ด้วยโมเดลที่แนบมา
 
 รันจาก root ของ repository:
 
 ```powershell
-# 1. ดาวน์โหลด CSV จาก UCI (ต้องต่ออินเทอร์เน็ต)
-.venv\Scripts\python download_data.py ai4i
-
-# 2. เทรนบนคอมพิวเตอร์ พร้อมสร้างรายงานและโมเดล
-.venv\Scripts\python ai4i.py train
-
-# 3. ทำนายและแสดงสรุปภาษาไทยโดยไม่ใช้อินเทอร์เน็ต
+# ทำนายและแสดงสรุปภาษาไทยโดยไม่ใช้อินเทอร์เน็ต
 .venv\Scripts\python ai4i.py predict --csv ai4i-artifacts/ordered_primary/parity_inputs.csv --limit 10
 ```
+
+ข้อมูลและโมเดลมีแล้ว หากต้องการเทรนใหม่ ใช้ `ai4i.py train --out ai4i-retrained`
+แยกจาก bundle ที่แนบมา อย่าเขียนทับโมเดล deployment จนกว่าจะตรวจ parity/manifest ใหม่
 
 ผลลัพธ์อยู่ใน `ai4i-artifacts/` แยก `ordered_primary/` และ `random_secondary/` แต่ละชุดมี `model.joblib`, `report.json`, indices และข้อมูลสำหรับตรวจผลซ้ำ ใช้ผลหลักเป็นค่าเริ่มต้น ไม่เลือก split ที่คะแนนสูงกว่ามาแทนผลหลัก
 
@@ -80,10 +118,14 @@ LLM รุ่นนี้เลือกข้อความที่ตรว�
 | `pump.py` | เทรนชุดปั๊ม ตรวจ parity และ replay CSV พร้อมวัดทรัพยากร |
 | `experiments.py` | เปรียบเทียบฟีเจอร์/โมเดลชุดปั๊ม 17 แบบ พร้อม shuffled-label controls |
 | `download_data.py` | ดาวน์โหลดข้อมูลต้นฉบับจาก UCI/Kaggle ตามคำสั่งผู้ใช้ |
+| `bridge.py` | ตัวกลาง schema → ML → facts → guarded summary |
+| `dashboard.py`, `web/` | หน้าเดโมออฟไลน์และ replay API |
+| `prepare_pi.py`, `pi_check.py` | แพ็กย้ายเครื่อง ตรวจ parity/runtime และ benchmark |
 | `test_*.py` | ทดสอบการตรวจข้อมูล ฟีเจอร์ ข้อมูลรั่ว parity และ LLM fallback |
 | `docs/` | วิธีใช้งาน ผลทดลอง และรายงานตรวจ target leakage |
 
-ข้อมูล, โมเดล, GGUF, virtual environment และไฟล์ ZIP ไม่รวมใน Git ให้ดาวน์โหลดและเทรนตามขั้นตอน
+ข้อมูลสาธารณะ โมเดลที่อนุมัติ และ ARM64 wheels รวมใน Git แล้ว ส่วน GGUF, llama.cpp,
+virtual environment, credentials, log และ ZIP ที่สร้างซ้ำได้ยังถูก ignore ดู [รายละเอียด](docs/GIT_CONTENTS.md)
 
 ## ข้อจำกัดและความถูกต้องของผล
 

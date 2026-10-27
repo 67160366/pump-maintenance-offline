@@ -1,20 +1,25 @@
 # คู่มือใช้งาน
 
+สำหรับ **dashboard และการย้ายของที่เทรนแล้วไป Pi** เริ่มที่ [PI_HANDOFF.md](PI_HANDOFF.md)
+คู่มือนี้อธิบายคำสั่ง train/predict/replay เดิมเป็นหลัก
+
 คำสั่งทั้งหมดรันจาก root ของ repository ตัวอย่าง Windows ใช้ `.venv\Scripts\python` ส่วน Pi/Linux ใช้ `.venv/bin/python` ไม่คัดลอก Windows virtual environment ไป Pi
 
 ## 1. เลือกชุดข้อมูลและติดตั้ง
 
-ติดตั้ง Python 3.11/3.12, Git และใช้ Raspberry Pi OS 64-bit สำหรับ Pi สร้าง environment:
+ติดตั้ง Python 3.12, Git และใช้ Raspberry Pi OS 64-bit สำหรับ Pi สร้าง environment:
 
 ```bash
 git clone https://github.com/67160366/pump-maintenance-offline.git
 cd pump-maintenance-offline
-python3 -m venv .venv
-.venv/bin/python -m pip install -r requirements.txt
+python3.12 -m venv .venv
+.venv/bin/python -m pip install --no-index --find-links wheels/pi4-cp312 -r requirements-pi.txt
 .venv/bin/python -m unittest -v
 ```
 
-บน Windows ใช้ `py -3.12 -m venv .venv` และ `.venv\Scripts\python` แทน สคริปต์ `download_data.py` ต้องใช้อินเทอร์เน็ต ส่วน inference ไม่ต้องใช้
+บน Windows ใช้ `py -3.12 -m venv .venv` และ `.venv\Scripts\python -m pip install -r requirements-pi.txt`
+จาก PyPI แทน ARM64 wheels ข้อมูลต้นฉบับและโมเดลมีใน Git แล้ว ไม่ต้องดาวน์โหลดหรือเทรนก่อนเดโม
+`download_data.py` ใช้เฉพาะเมื่อต้องการดึงต้นฉบับใหม่ไปยัง checkout ที่ไม่มีไฟล์อยู่แล้ว:
 
 ```bash
 .venv/bin/python download_data.py ai4i
@@ -27,10 +32,11 @@ helper ไม่เขียนทับ CSV ที่มีอยู่ ถ้�
 ## 2. เทรน AI4I บนคอมพิวเตอร์
 
 ```bash
-.venv/bin/python ai4i.py train
+.venv/bin/python ai4i.py train --out ai4i-retrained
 ```
 
-ผลอยู่ใน `ai4i-artifacts/RESULTS.md`, `audit.json`, `comparison.json` และโฟลเดอร์โมเดลสองแบบ:
+ผลเทรนใหม่อยู่ใน `ai4i-retrained/` เพื่อไม่เขียนทับโมเดลที่ส่งต่อ ส่วนผลที่แนบใน Git
+อยู่ใน `ai4i-artifacts/RESULTS.md`, `audit.json`, `comparison.json` และโฟลเดอร์โมเดลสองแบบ:
 
 - `ordered_primary/`: ผลหลัก แบ่งตามลำดับแถว 60/20/20
 - `random_secondary/`: ผลรอง stratified random 60/20/20

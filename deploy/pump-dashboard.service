@@ -1,0 +1,22 @@
+[Unit]
+Description=Offline maintenance CSV replay dashboard
+After=local-fs.target
+
+[Service]
+Type=simple
+# Edit BOTH paths and User to match your account and Git clone or extracted release.
+User=YOUR_USER
+WorkingDirectory=/home/YOUR_USER/pump-demo
+ExecStart=/home/YOUR_USER/pump-demo/.venv/bin/python dashboard.py --host 127.0.0.1 --port 8080
+Environment=PYTHONUNBUFFERED=1
+Environment=OMP_NUM_THREADS=2
+Environment=OPENBLAS_NUM_THREADS=2
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=40
+KillMode=control-group
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

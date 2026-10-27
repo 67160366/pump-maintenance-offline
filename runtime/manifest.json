@@ -1,0 +1,13 @@
+{
+  "sha256": {
+    "demo.csv": "6267b4edeb3e97ebe333b72d07ae20279321ad5db8a346c6b3783c05ff96b791",
+    "demo_provenance.json": "3f7b45299f433483b1a3dd0f151d797b8c7eb8ce09f98bef8f647fbd07642e6a",
+    "model.joblib": "24043f821f48a5fba59a7aaaffdcd7d53e505bbe2849e7b755207e58e3024714",
+    "parity_expected.json": "267dc9cca94daa855783b3cd1da556475bb2e61cc8e1bb5be55d1375e076dd0a",
+    "parity_inputs.csv": "2cd987daf53c1709b39c51de319ee31b5b44411c092e45ea6a16e87f268d7688",
+    "release.json": "ccd52b48fc6636ff470e9bc51eb083f425a4244ee3329f738b709c9777697acd",
+    "report.json": "2837863a66c0e7e8939a44e7077b1203d316d405e5989def9a40342204d6d16a",
+    "requirements-pi.txt": "b2d9053b035cc5cd5a8c6f2daad31ca9220fe097483caf39265e586c0dd4c452"
+  },
+  "note": "Integrity of the versioned runtime payload only. Source and wheels are versioned in the containing Git commit."
+}

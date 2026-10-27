@@ -1,0 +1,437 @@
+{
+  "split": "ordered_primary",
+  "sizes": {
+    "train": {
+      "rows": 6000,
+      "failures": 255
+    },
+    "validation": {
+      "rows": 2000,
+      "failures": 45
+    },
+    "test": {
+      "rows": 2000,
+      "failures": 39
+    }
+  },
+  "candidates": [
+    {
+      "name": "dummy_majority",
+      "threshold": 0.5,
+      "validation": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "pr_auc": 0.0225,
+        "confusion_matrix": [
+          [
+            1955,
+            0
+          ],
+          [
+            45,
+            0
+          ]
+        ],
+        "rows": 2000,
+        "accuracy": 0.9775,
+        "balanced_accuracy": 0.5,
+        "roc_auc": 0.5
+      },
+      "bytes": 626,
+      "train_seconds": 0.0084359999998469
+    },
+    {
+      "name": "logistic_raw_default",
+      "threshold": 0.28,
+      "validation": {
+        "precision": 0.59375,
+        "recall": 0.4222222222222222,
+        "f1": 0.4935064935064935,
+        "pr_auc": 0.41567003547523174,
+        "confusion_matrix": [
+          [
+            1942,
+            13
+          ],
+          [
+            26,
+            19
+          ]
+        ],
+        "rows": 2000,
+        "accuracy": 0.9805,
+        "balanced_accuracy": 0.7077863029269679,
+        "roc_auc": 0.8980846831486218
+      },
+      "bytes": 1396,
+      "train_seconds": 0.36632010000016635
+    },
+    {
+      "name": "logistic_raw_balanced",
+      "threshold": 0.79,
+      "validation": {
+        "precision": 0.3230769230769231,
+        "recall": 0.4666666666666667,
+        "f1": 0.38181818181818183,
+        "pr_auc": 0.3690081111822763,
+        "confusion_matrix": [
+          [
+            1911,
+            44
+          ],
+          [
+            24,
+            21
+          ]
+        ],
+        "rows": 2000,
+        "accuracy": 0.966,
+        "balanced_accuracy": 0.722080136402387,
+        "roc_auc": 0.8938448422847399
+      },
+      "bytes": 1406,
+      "train_seconds": 0.37066230000004907
+    },
+    {
+      "name": "forest_raw_8",
+      "threshold": 0.41000000000000003,
+      "validation": {
+        "precision": 0.44776119402985076,
+        "recall": 0.6666666666666666,
+        "f1": 0.5357142857142857,
+        "pr_auc": 0.5022910147823307,
+        "confusion_matrix": [
+          [
+            1918,
+            37
+          ],
+          [
+            15,
+            30
+          ]
+        ],
+        "rows": 2000,
+        "accuracy": 0.974,
+        "balanced_accuracy": 0.8238704177323103,
+        "roc_auc": 0.9501108269394715
+      },
+      "bytes": 1340291,
+      "train_seconds": 0.6071540000000368
+    },
+    {
+      "name": "forest_raw_12",
+      "threshold": 0.35000000000000003,
+      "validation": {
+        "precision": 0.5833333333333334,
+        "recall": 0.6222222222222222,
+        "f1": 0.6021505376344086,
+        "pr_auc": 0.6011328170862003,
+        "confusion_matrix": [
+          [
+            1935,
+            20
+          ],
+          [
+            17,
+            28
+          ]
+        ],
+        "rows": 2000,
+        "accuracy": 0.9815,
+        "balanced_accuracy": 0.8059960215970446,
+        "roc_auc": 0.9629212844558113
+      },
+      "bytes": 2258073,
+      "train_seconds": 0.6179061999998794
+    },
+    {
+      "name": "histgb_raw_7",
+      "threshold": 0.34,
+      "validation": {
+        "precision": 0.7931034482758621,
+        "recall": 0.5111111111111111,
+        "f1": 0.6216216216216216,
+        "pr_auc": 0.6580597435756416,
+        "confusion_matrix": [
+          [
+            1949,
+            6
+          ],
+          [
+            22,
+            23
+          ]
+        ],
+        "rows": 2000,
+        "accuracy": 0.986,
+        "balanced_accuracy": 0.7540210287013356,
+        "roc_auc": 0.9708326229042341
+      },
+      "bytes": 135332,
+      "train_seconds": 0.47434240000006866
+    },
+    {
+      "name": "histgb_raw_15",
+      "threshold": 0.22,
+      "validation": {
+        "precision": 0.625,
+        "recall": 0.6666666666666666,
+        "f1": 0.6451612903225806,
+        "pr_auc": 0.7219652547309803,
+        "confusion_matrix": [
+          [
+            1937,
+            18
+          ],
+          [
+            15,
+            30
+          ]
+        ],
+        "rows": 2000,
+        "accuracy": 0.9835,
+        "balanced_accuracy": 0.8287297527706734,
+        "roc_auc": 0.9746291560102301
+      },
+      "bytes": 269750,
+      "train_seconds": 0.5155554999998913
+    },
+    {
+      "name": "logistic_physics_default",
+      "threshold": 0.21000000000000002,
+      "validation": {
+        "precision": 0.42857142857142855,
+        "recall": 0.4666666666666667,
+        "f1": 0.44680851063829785,
+        "pr_auc": 0.33647050616020974,
+        "confusion_matrix": [
+          [
+            1927,
+            28
+          ],
+          [
+            24,
+            21
+          ]
+        ],
+        "rows": 2000,
+        "accuracy": 0.974,
+        "balanced_accuracy": 0.7261722080136402,
+        "roc_auc": 0.8935265700483092
+      },
+      "bytes": 1492,
+      "train_seconds": 0.3505094999998164
+    },
+    {
+      "name": "logistic_physics_balanced",
+      "threshold": 0.8,
+      "validation": {
+        "precision": 0.3076923076923077,
+        "recall": 0.5333333333333333,
+        "f1": 0.3902439024390244,
+        "pr_auc": 0.2947933442743664,
+        "confusion_matrix": [
+          [
+            1901,
+            54
+          ],
+          [
+            21,
+            24
+          ]
+        ],
+        "rows": 2000,
+        "accuracy": 0.9625,
+        "balanced_accuracy": 0.7528559249786871,
+        "roc_auc": 0.911179312304632
+      },
+      "bytes": 1502,
+      "train_seconds": 0.36559029999989434
+    },
+    {
+      "name": "forest_physics_8",
+      "threshold": 0.5,
+      "validation": {
+        "precision": 0.9714285714285714,
+        "recall": 0.7555555555555555,
+        "f1": 0.85,
+        "pr_auc": 0.8598711456548978,
+        "confusion_matrix": [
+          [
+            1954,
+            1
+          ],
+          [
+            11,
+            34
+          ]
+        ],
+        "rows": 2000,
+        "accuracy": 0.994,
+        "balanced_accuracy": 0.8775220233020744,
+        "roc_auc": 0.9833589087809036
+      },
+      "bytes": 1038335,
+      "train_seconds": 0.7020878000000721
+    },
+    {
+      "name": "forest_physics_12",
+      "threshold": 0.41000000000000003,
+      "validation": {
+        "precision": 1.0,
+        "recall": 0.7555555555555555,
+        "f1": 0.8607594936708861,
+        "pr_auc": 0.8689325584945704,
+        "confusion_matrix": [
+          [
+            1955,
+            0
+          ],
+          [
+            11,
+            34
+          ]
+        ],
+        "rows": 2000,
+        "accuracy": 0.9945,
+        "balanced_accuracy": 0.8777777777777778,
+        "roc_auc": 0.9762830349531116
+      },
+      "bytes": 1499189,
+      "train_seconds": 0.6719731999999112
+    },
+    {
+      "name": "histgb_physics_7",
+      "threshold": 0.74,
+      "validation": {
+        "precision": 0.9310344827586207,
+        "recall": 0.6,
+        "f1": 0.7297297297297297,
+        "pr_auc": 0.7898994443612093,
+        "confusion_matrix": [
+          [
+            1953,
+            2
+          ],
+          [
+            18,
+            27
+          ]
+        ],
+        "rows": 2000,
+        "accuracy": 0.99,
+        "balanced_accuracy": 0.7994884910485933,
+        "roc_auc": 0.9782608695652174
+      },
+      "bytes": 140151,
+      "train_seconds": 0.459113299999899
+    },
+    {
+      "name": "histgb_physics_15",
+      "threshold": 0.25,
+      "validation": {
+        "precision": 0.8333333333333334,
+        "recall": 0.6666666666666666,
+        "f1": 0.7407407407407407,
+        "pr_auc": 0.7869484100517066,
+        "confusion_matrix": [
+          [
+            1949,
+            6
+          ],
+          [
+            15,
+            30
+          ]
+        ],
+        "rows": 2000,
+        "accuracy": 0.9895,
+        "balanced_accuracy": 0.8317988064791133,
+        "roc_auc": 0.9736004546746233
+      },
+      "bytes": 274569,
+      "train_seconds": 0.49213419999978214
+    }
+  ],
+  "selected": "forest_physics_12",
+  "threshold": 0.41000000000000003,
+  "test": {
+    "precision": 0.875,
+    "recall": 0.717948717948718,
+    "f1": 0.7887323943661971,
+    "pr_auc": 0.7682483851767766,
+    "confusion_matrix": [
+      [
+        1957,
+        4
+      ],
+      [
+        11,
+        28
+      ]
+    ],
+    "rows": 2000,
+    "accuracy": 0.9925,
+    "balanced_accuracy": 0.8579544711620184,
+    "roc_auc": 0.9490056093829679
+  },
+  "dummy_test": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "pr_auc": 0.0195,
+    "confusion_matrix": [
+      [
+        1961,
+        0
+      ],
+      [
+        39,
+        0
+      ]
+    ],
+    "rows": 2000,
+    "accuracy": 0.9805,
+    "balanced_accuracy": 0.5,
+    "roc_auc": 0.5
+  },
+  "per_failure_alert_rate": {
+    "TWF": {
+      "rows": 10,
+      "alert_rate": 0.1
+    },
+    "HDF": {
+      "rows": 0,
+      "alert_rate": null
+    },
+    "PWF": {
+      "rows": 10,
+      "alert_rate": 1.0
+    },
+    "OSF": {
+      "rows": 21,
+      "alert_rate": 1.0
+    },
+    "RNF": {
+      "rows": 0,
+      "alert_rate": null
+    }
+  },
+  "meets_accuracy_80": true,
+  "meets_balanced_accuracy_80": true,
+  "meets_f1_80": false,
+  "batch_inference_seconds": 0.024949000000106025,
+  "hardware": "PC, not Pi",
+  "source": "https://archive.ics.uci.edu/dataset/601/ai4i+2020+predictive+maintenance+dataset",
+  "excluded_features": [
+    "UDI",
+    "UID",
+    "Product ID",
+    "TWF",
+    "HDF",
+    "PWF",
+    "OSF",
+    "RNF"
+  ]
+}
