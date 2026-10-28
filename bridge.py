@@ -105,6 +105,15 @@ class InferenceBridge:
         self.frame = (ai4i.load if dataset == 'ai4i' else pump.load_frame)(csv)
         if self.frame.empty:
             raise ValueError('Replay CSV is empty')
+        self.measured_times = [None] * len(self.frame)
+        if 'Measured_At' in self.frame:
+            for i, value in enumerate(self.frame['Measured_At']):
+                if pd.isna(value):
+                    continue
+                measured = datetime.fromisoformat(str(value).replace('Z', '+00:00'))
+                if measured.tzinfo is None:
+                    raise ValueError('Measured_At requires an ISO-8601 timezone offset')
+                self.measured_times[i] = measured.astimezone(timezone.utc).isoformat()
         self.args = SimpleNamespace(llama_cli=llama_cli, gguf=gguf)
         self.model_path = str(Path(model).resolve())
         self.csv_path = str(Path(csv).resolve())
@@ -137,6 +146,8 @@ class InferenceBridge:
                 raise ValueError('Model returned an invalid score')
         status = int(value >= self.threshold) if valid else None
         event = dict(row=index + 1, at=datetime.now(timezone.utc).isoformat(), readings=readings,
+                     measured_at=self.measured_times[index],
+                     machine_id=str(self.frame['Pump_ID'].iloc[index]) if self.dataset == 'pump' else None,
                      status=status, score=value, threshold=self.threshold,
                      inference_seconds=time.perf_counter()-start, summary=None,
                      summary_method='pending', llm_seconds=0.0,

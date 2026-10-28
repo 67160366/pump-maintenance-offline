@@ -56,10 +56,13 @@ AI4I ปฏิเสธ CSV ที่ขาดค่า/ค่าผิด schem
 - `GET /api/state` — metadata, current event, history สูงสุด 60 แถว, resources, error
 - `POST /api/action` — JSON `{"action":"step"}` / `start` / `pause` / `reset`
 - `GET /api/export` — snapshot session ล่าสุดสำหรับบันทึก JSON; ไม่ใช่ benchmark peak
+- `GET /api/records?scope=session|all` — ประวัติ SQLite ล่าสุด 100 รายการและจำนวนรวม
+- `POST /api/ask` — คำถาม 1–400 ตัวอักษร + scope; fixed query และ citations
 - poll ทุก 700 ms; worker หนึ่งตัว ไม่สะสมคิวและไม่เปิด LLM หลาย process พร้อมกัน
 - `start` เล่นจนจบ CSV; `pause` หยุดแถวถัดไป, งานปัจจุบันทำจนเสร็จ;
   `reset` ต้องรอแถวปัจจุบันเสร็จแล้ว
-- state อยู่ใน RAM และร่วมกันทุก browser; restart server ทำให้เริ่ม session ใหม่
+- replay state อยู่ใน RAM และร่วมกันทุก browser; restart/reset เริ่ม session ใหม่
+  ส่วนผลที่ประมวลเสร็จบันทึกลง SQLite และเลือกดูทั้งหมดที่บันทึกได้
 
 Server ใช้ Python standard library เพื่อเดโมในเครื่อง/วง LAN ที่เชื่อถือได้ ค่าเริ่มต้น
 bind `127.0.0.1` ไม่มี auth, multi-user isolation หรือ production reverse proxy
@@ -73,3 +76,7 @@ bind `127.0.0.1` ไม่มี auth, multi-user isolation หรือ product
 
 RAM บนหน้าเว็บเป็นค่าขณะนั้นรวม process ลูก; benchmark เก็บ peak แยกใน `pi_check.py`
 อุณหภูมิอ่านจาก Linux thermal sysfs หากรองรับ ค่าอ่านไม่ได้จะแสดงชัดเจน
+
+หน้าระบบใหม่สำหรับจอ 800×480 และ data assistant อธิบายเพิ่มใน
+[PI_SCREEN_DESIGN.md](PI_SCREEN_DESIGN.md) คำถามอาจให้ LLM เลือก intent ผ่าน grammar
+แต่จำนวน อันดับ รหัสเครื่อง และ SQL มาจาก Python/SQLite เท่านั้น

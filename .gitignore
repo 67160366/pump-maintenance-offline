@@ -42,3 +42,5 @@ benchmark*.json
 requirements-lock.txt
 pi-release*/
 evidence/
+*.sqlite3
+*.sqlite3-*

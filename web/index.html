@@ -1,31 +1,34 @@
 <!doctype html>
 <html lang="th">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Pump Lab · Offline maintenance</title><link rel="stylesheet" href="/style.css">
-  <script src="/app.js" defer></script>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pump Lab · หน้าจอ Pi</title><link rel="stylesheet" href="/style.css"><script src="/app.js" defer></script>
 </head>
-<body>
-<div class="shell">
-  <header><a class="brand" href="/" aria-label="Pump Lab home"><span class="brand-mark">P</span><span>PUMP LAB<small>MAINTENANCE / EDGE DEMO</small></span></a><div class="connection"><span id="connection-dot" class="dot"></span><span id="connection">กำลังเชื่อมต่อเครื่อง</span></div></header>
-  <main>
-    <section class="intro"><div><p class="eyebrow">RASPBERRY PI 4 · LOCAL INFERENCE</p><h1>มองเห็นทุกขั้นตอน<br><span>ก่อนตัดสินใจดูแลเครื่องจักร</span></h1><p class="description">ค่าที่วัด → ผลจากโมเดล → ข้อความสรุปไทย ในเครื่องเดียว</p></div><div class="mode-card"><span class="tiny">แหล่งข้อมูลเดโม</span><strong id="dataset">—</strong><span>CSV replay • ไม่ใช่เซนเซอร์สด</span><span id="llm-config">กำลังอ่านการตั้งค่า</span></div></section>
-    <div class="notice" id="warning">กำลังโหลดข้อมูลระบบ…</div>
-    <section class="toolbar" aria-label="ควบคุมเดโม"><div class="buttons"><button id="start" class="primary">▶ เล่นอัตโนมัติ</button><button id="pause">หยุดพัก</button><button id="step">อ่านแถวถัดไป →</button><button id="reset" class="quiet">เริ่มใหม่</button></div><div><span id="run-state">พร้อมเริ่ม</span><span class="divider">/</span><span id="position">0 / 0 แถว</span></div></section>
-    <p id="error" class="error" role="alert" hidden></p>
-    <section class="pipeline" aria-label="เส้นทางข้อมูล">
-      <div id="stage-input"><span>01</span><strong>รับค่าจาก CSV</strong><small>ตรวจชื่อคอลัมน์และค่าที่วัด</small></div><b aria-hidden="true">→</b>
-      <div id="stage-model"><span>02</span><strong>โมเดล ML</strong><small>คำนวณคะแนนและสถานะ</small></div><b aria-hidden="true">→</b>
-      <div id="stage-bridge"><span>03</span><strong>ตัวกลาง Python</strong><small>จัดข้อเท็จจริง + ตรวจคำตอบ</small></div><b aria-hidden="true">→</b>
-      <div id="stage-summary"><span>04</span><strong>สรุปภาษาไทย</strong><small id="summary-stage">Template / LLM ในเครื่อง</small></div>
-    </section>
-    <div class="workspace">
-      <section class="panel sensors"><div class="panel-heading"><span class="eyebrow">INPUT SNAPSHOT</span><span id="row-number" class="tag">รอข้อมูล</span></div><h2>ค่าที่วัด</h2><div id="readings" class="reading-list"><p class="muted">กดอ่านแถวถัดไปเพื่อเริ่มเดโม</p></div><p class="footnote" id="sensor-note">หน่วยแสดงตามชุดข้อมูล</p></section>
-      <section class="panel result"><div class="panel-heading"><span class="eyebrow">CLASSIFIER OUTPUT</span><span class="tag">ML ตัดสินสถานะ</span></div><h2>ผลประเมินจากโมเดล</h2><div id="status" class="status idle" aria-live="polite">รอประมวลผล</div><div class="score-line"><strong id="score">—</strong><span>คะแนนโมเดล<br><small>ไม่ใช่โอกาสเสียที่ยืนยันแล้ว</small></span></div><progress id="score-bar" value="0" max="1" aria-label="คะแนนโมเดล"></progress><div class="score-meta"><span>Threshold <b id="threshold">—</b></span><span id="inference-time">— ms</span></div><div class="chart-heading"><h3>คะแนนตามลำดับ replay</h3><span>0–1</span></div><svg id="chart" viewBox="0 0 400 100" role="img" aria-label="ประวัติคะแนนโมเดลและเส้น threshold"></svg><p class="footnote">ลำดับแถวเดโม ไม่ใช่แนวโน้มตามเวลาจริง</p></section>
-      <section class="panel summary"><div class="panel-heading"><span class="eyebrow">THAI SUMMARY</span><span id="summary-method" class="tag">ยังไม่มีสรุป</span></div><h2>สรุปเพื่อช่วยอ่านผล</h2><p class="summary-description">ตัวเลขและสถานะมาจากโมเดล<br>LLM เลือกข้อความที่ผ่านการตรวจสอบ</p><div id="summary" class="summary-text" aria-live="polite">เมื่ออ่านข้อมูล ระบบจะแสดงข้อเท็จจริงและข้อความไทยที่นี่</div><div class="summary-footer"><span id="llm-time">เวลา LLM —</span><span>Fallback พร้อมใช้งาน</span></div></section>
-    </div>
-    <section class="bottom-grid"><div class="panel history"><div class="section-heading"><h2>ประวัติการทำงาน</h2><a href="/api/export" download="demo-session.json">บันทึกผล JSON ↗</a></div><div class="table-scroll"><table><thead><tr><th>แถว</th><th>สถานะ</th><th>คะแนน</th><th>ML</th><th>วิธีสรุป</th></tr></thead><tbody id="history"><tr><td colspan="5" class="muted">ยังไม่มีผลประเมิน</td></tr></tbody></table></div></div><div class="panel machine"><span class="eyebrow">DEVICE / RUNTIME</span><h2>เครื่องที่กำลังรัน</h2><dl><div><dt>สถาปัตยกรรม</dt><dd id="machine">—</dd></div><div><dt>RAM โปรแกรม + LLM</dt><dd id="rss">—</dd></div><div><dt>RAM ระบบทั้งหมด</dt><dd id="system-memory">—</dd></div><div><dt>อุณหภูมิ CPU</dt><dd id="temperature">—</dd></div></dl><p class="footnote">ค่าขณะนี้ ไม่ใช่ peak benchmark<br>ยังไม่ยืนยันการตรวจรับฮาร์ดแวร์ Pi</p></div></section>
-    <details class="technical"><summary>ดูข้อมูลที่ตัวกลางจัดให้ระบบสรุป และข้อมูลโมเดล</summary><p>สถานะและตัวเลขถูกจัดเป็นข้อเท็จจริง ก่อนสร้าง prompt ให้ LLM เลือก A/B หากคำตอบผิดรูปแบบ ขัดกับสถานะ หรือเกิน 30 วินาที ระบบใช้ template</p><pre id="handoff">ยังไม่มีข้อมูล</pre><pre id="model-info"></pre></details>
-  </main><footer><span>PUMP LAB / OFFLINE DEMONSTRATOR</span><span>Snapshot classification · ไม่ระบุสาเหตุยืนยันหรือเวลาที่จะเสีย</span></footer>
-</div>
-</body></html>
+<body><div class="app">
+<header class="topbar"><a class="brand" href="/" aria-label="Pump Lab home"><span class="brand-mark">P</span><strong>PUMP LAB</strong><span class="device-label">PI CONSOLE</span></a><div class="top-status"><span id="connection-dot" class="dot"></span><span id="connection">กำลังเชื่อมต่อ</span><button id="device-info" class="icon-button" aria-label="ดูข้อมูลระบบ">ระบบ ⓘ</button></div></header>
+<div class="source-bar"><span id="source">CSV replay / กำลังโหลด</span><span id="context-note">ข้อมูลสาธิต</span></div>
+<main>
+<div id="error" class="error" role="alert" hidden></div>
+<section id="page-overview" class="page overview-page" aria-labelledby="overview-title">
+ <div class="page-heading"><h1 id="overview-title">ภาพรวมรอบนี้</h1><span id="position" class="muted">0 / 0 แถว</span></div>
+ <div class="stats-grid"><div class="stat attention"><span>บันทึกที่โมเดลเตือน</span><strong id="alert-count">0</strong></div><div class="stat"><span>ยังไม่พบสัญญาณ</span><strong id="normal-count">0</strong></div><div class="stat"><span>บันทึกในรอบนี้</span><strong id="total-count">0</strong></div></div>
+ <div class="overview-grid"><article class="panel latest-panel"><div class="section-heading"><h2>ผลล่าสุด</h2><span id="latest-identity" class="tag">รอข้อมูล</span></div><div id="status" class="status idle" aria-live="polite">พร้อมอ่านข้อมูล</div><div class="latest-values"><div><span>คะแนนโมเดล</span><strong id="score">—</strong></div><div><span id="temperature-label">อุณหภูมิกระบวนการ</span><strong id="latest-temperature">—</strong></div></div><div class="latest-bottom"><span id="latest-note">กดอ่านถัดไปเพื่อเริ่ม</span><button id="open-latest" class="text-button" disabled>ดูรายละเอียด →</button></div></article><article class="panel attention-panel"><div class="section-heading"><h2>รายการที่ควรดู</h2><span class="tiny">ล่าสุด 3 รายการ</span></div><div id="attention-list" class="attention-list"><p class="empty">อ่านข้อมูลเพื่อดูรายการที่ควรตรวจ</p></div></article></div>
+ <div class="replay-controls"><div class="control-buttons"><button id="play" class="primary">▶ เล่นเดโม</button><button id="step">อ่านถัดไป →</button><button id="reset" class="quiet">เริ่มใหม่</button></div><span id="run-state" class="tiny">พร้อมเริ่ม</span></div>
+</section>
+<section id="page-history" class="page history-page" aria-labelledby="history-title" hidden>
+ <div class="page-heading"><h1 id="history-title">ประวัติข้อมูล</h1><label class="scope-label">ช่วงข้อมูล<select id="history-scope"><option value="session">รอบนี้</option><option value="all">ทั้งหมดที่บันทึก</option></select></label></div><p class="context-line" id="history-context">เวลาที่แสดงคือเวลาบันทึก replay ไม่ใช่เวลาวัดจริง</p><div class="record-list" id="record-list"></div><div class="pagination"><button id="previous-page">← ก่อนหน้า</button><span id="page-number">1 / 1</span><button id="next-page">ถัดไป →</button><a href="/api/export" download="demo-session.json" class="export-link">บันทึก JSON ↗</a></div>
+</section>
+<section id="page-ask" class="page ask-page" aria-labelledby="ask-title" hidden>
+ <div class="page-heading"><h1 id="ask-title">ถามข้อมูลที่บันทึก</h1><label class="scope-label">ช่วงข้อมูล<select id="ask-scope"><option value="session">รอบนี้</option><option value="all">ทั้งหมดที่บันทึก</option></select></label></div><div class="ask-mode"><span id="ask-method" class="mode-dot">ผู้ช่วยข้อมูลในเครื่อง</span><span id="ask-note">อ่านหลักฐานจาก SQLite</span></div>
+ <div id="chat-log" class="chat-log" role="log" aria-live="polite"><div class="welcome"><strong>อยากตรวจดูอะไร?</strong><p>ถามรายการเตือน อุณหภูมิสูงสุด หรือสรุปข้อมูล<br>ทุกคำตอบมีบันทึกอ้างอิงให้เปิดดู</p><p class="tiny">AI4I ไม่มีรหัสเครื่องและเวลาวัดจริง จึงยังตอบระบุเครื่องของวันนี้ไม่ได้</p></div></div>
+ <div class="suggestions"><button data-question="มีรายการเตือนอะไรบ้าง">รายการเตือน</button><button data-question="อุณหภูมิสูงสุด">อุณหภูมิสูงสุด</button><button data-question="สรุปข้อมูล">สรุปข้อมูล</button></div><form id="question-form" class="composer"><label class="sr-only" for="question">คำถามเกี่ยวกับข้อมูล</label><input id="question" maxlength="400" autocomplete="off" placeholder="เช่น มีรายการเตือนอะไรบ้าง"><button id="send-question" type="submit" class="primary">ถาม →</button></form>
+</section>
+<section id="page-detail" class="page detail-page" aria-labelledby="detail-title" hidden>
+ <div class="page-heading"><button id="back-detail" class="back-button">← กลับ</button><h1 id="detail-title">รายละเอียดข้อมูล</h1><span id="detail-reference" class="tag"></span></div><div class="detail-grid"><article class="panel"><h2>ค่าที่บันทึก</h2><div id="detail-readings" class="detail-readings"></div><p id="detail-time" class="tiny"></p></article><article class="panel summary-panel"><div class="section-heading"><h2>สรุปผล</h2><span id="detail-method" class="tag"></span></div><div id="detail-summary" class="detail-summary"></div><details class="facts"><summary>เส้นทางข้อมูล / ข้อเท็จจริงของโมเดล</summary><p>CSV → Python ตรวจข้อมูล → ML + threshold → ข้อเท็จจริง → ข้อความไทย</p><pre id="detail-facts"></pre></details></article></div>
+</section>
+<section id="page-system" class="page system-page" aria-labelledby="system-title" hidden>
+ <div class="page-heading"><button id="back-system" class="back-button">← กลับ</button><h1 id="system-title">ข้อมูลระบบ</h1><span class="tag">เครื่องที่กำลังรัน</span></div><div class="system-grid"><article class="panel"><dl id="system-values"></dl></article><article class="panel"><h2>ขอบเขตการสาธิต</h2><p id="system-warning"></p><p>คะแนนเป็นผลจากโมเดล ยังไม่ใช่โอกาสเสียที่ผ่าน calibration ไม่มีการทำนายเวลาที่จะเสีย</p><p class="tiny">ยังไม่ยืนยันการตรวจรับ Pi • RAM ที่แสดงเป็นค่าขณะนี้ ไม่ใช่ peak benchmark</p><p class="tiny">LLM สรุปแถวเลือก A/B; โหมดถามข้อมูลให้ LLM เลือกประเภทคำถามได้ แล้ว Python คำนวณคำตอบจากฐานข้อมูล</p></article></div>
+</section>
+</main>
+<nav class="bottom-nav" aria-label="หน้าหลัก"><button data-page="overview" class="nav-item active" aria-current="page"><span aria-hidden="true">◫</span> ภาพรวม</button><button data-page="history" class="nav-item"><span aria-hidden="true">≡</span> ประวัติ</button><button data-page="ask" class="nav-item"><span aria-hidden="true">◇</span> ถามข้อมูล</button></nav>
+</div></body></html>

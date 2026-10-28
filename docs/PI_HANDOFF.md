@@ -29,6 +29,12 @@ python3.12 -m venv .venv
 ค่าเริ่มต้นตรวจ `runtime/manifest.json` และ dependency versions ก่อนโหลดโมเดล
 ระบุ `--release runtime` ได้โดยตรงเช่นกัน
 
+หน้าจอใหม่แยกภาพรวม/ประวัติ/ถามข้อมูลสำหรับ 800×480 อ่าน
+[PI_SCREEN_DESIGN.md](PI_SCREEN_DESIGN.md) SQLite อยู่ `evidence/telemetry.sqlite3`
+การกดเริ่มใหม่หรือเปิด server ใหม่ไม่ลบประวัติ เลือก “ทั้งหมดที่บันทึก” เพื่อดูรอบก่อน
+หากเปิด LLM ช่วยอ่านคำถามเพิ่ม `--llm-questions` พร้อม paths ที่มีจริงตามคู่มือหน้าจอ
+ตัวเลือกนี้มี timeout 10 วินาทีและ fallback; ต้องหยุด replay ก่อนถาม
+
 หลัง preflight ผ่าน ให้หยุด server ด้วย Ctrl+C, ถอด network จริง แล้วตรวจรอบ offline:
 
 ```bash

@@ -91,6 +91,40 @@ class DashboardTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'threshold'):
             self.inference.verify(self.csv, expected)
 
+    def test_measurement_time_is_explicit_and_machine_id_is_not_invented(self):
+        self.frame['Measured_At'] = '2026-10-28T10:00:00'
+        self.frame.to_csv(self.csv, index=False)
+        with self.assertRaisesRegex(ValueError, 'timezone'):
+            bridge.InferenceBridge('ai4i', self.model, self.csv)
+        self.frame['Measured_At'] = '2026-10-28T10:00:00+07:00'
+        self.frame.to_csv(self.csv, index=False)
+        event = bridge.InferenceBridge('ai4i', self.model, self.csv).evaluate(0)
+        self.assertEqual(event['measured_at'], '2026-10-28T03:00:00+00:00')
+        self.assertIsNone(event['machine_id'])
+        self.assertNotIn('Measured_At', event['handoff']['readings'])
+
+    def test_questions_block_new_inference_and_reset_preserves_sqlite_history(self):
+        controller = dashboard.ReplayController(self.inference, .01)
+        entered, finish = threading.Event(), threading.Event()
+        results = []
+        def slow_answer(*args):
+            entered.set(); finish.wait(3)
+            return {'answer':'fixture'}
+        try:
+            controller.action('step'); self.wait_position(controller, 1)
+            with patch('data_assistant.answer', side_effect=slow_answer):
+                thread = threading.Thread(target=lambda: results.append(controller.ask('สรุปข้อมูล')))
+                thread.start(); self.assertTrue(entered.wait(2))
+                with self.assertRaises(ValueError): controller.action('step')
+                with self.assertRaises(ValueError): controller.action('reset')
+                finish.set(); thread.join(3)
+            self.assertEqual(results[0]['answer'],'fixture')
+            controller.action('reset')
+            self.assertEqual(controller.snapshot()['stored']['total'],0)
+            self.assertEqual(controller.store.stats('ai4i', controller.session,'all')['total'],1)
+        finally:
+            finish.set(); controller.close()
+
     def test_missing_pump_input_skips_classifier_and_llm(self):
         frame = pd.DataFrame([[1, None, 1, 2, 3, 4, 5]], columns=['Pump_ID']+pump.FEATURES)
         csv = self.root/'pump.csv'; frame.to_csv(csv, index=False)
@@ -101,6 +135,7 @@ class DashboardTests(unittest.TestCase):
         with patch('pump.score', side_effect=AssertionError('must not run')), patch('pump.summarize', side_effect=AssertionError('must not run')):
             event = inference.evaluate(0)
         self.assertIsNone(event['status'])
+        self.assertEqual(event['machine_id'], '1')
         self.assertEqual(event['summary_method'], 'template_missing_data')
 
     def test_no_overlapping_jobs_pause_and_reset(self):
@@ -146,6 +181,16 @@ class DashboardTests(unittest.TestCase):
             with self.assertRaises(HTTPError) as caught: post('invalid')
             self.assertEqual(caught.exception.code, 400)
             with urlopen(base+'/api/state') as response: self.assertEqual(json.load(response)['position'], 1)
+            with urlopen(base+'/api/records') as response:
+                saved = json.load(response)
+            self.assertEqual(saved['stats']['total'], 1)
+            request = Request(base+'/api/ask', json.dumps(dict(question='สรุปข้อมูลรอบนี้')).encode(),
+                              {'Content-Type':'application/json'})
+            with urlopen(request) as response:
+                answer = json.load(response)
+            self.assertEqual(answer['stats']['total'], 1)
+            self.assertEqual(answer['citations'][0]['record_id'], saved['records'][0]['record_id'])
+            self.assertEqual(answer['method'], 'local_data_query')
         finally:
             server.shutdown(); server.server_close(); thread.join(); controller.close()
 
