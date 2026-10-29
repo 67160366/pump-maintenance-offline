@@ -1,5 +1,31 @@
 # สถานะและงานถัดไป
 
+## ผลตรวจชุดที่เผยแพร่บน GitHub
+
+Push branch `codex/pi-ready-environment` แล้ว clone กลับจาก GitHub ผ่าน HTTPS ไป
+โฟลเดอร์ใหม่ ตรวจ code commit `b8b5de3` จาก remote จริงโดยไม่ใช้โมเดลจาก working tree
+หรือคัดลอก venv ไปไว้ใน clone ผลที่ยืนยันได้:
+
+- โมเดล ML ทั้ง 5 ไฟล์เป็น binary จริง ไม่ใช่ LFS pointer และ hash ตรง approved assets
+  โมเดลหลัก `runtime/model.joblib` มี 484,534 bytes; wheels ARM64 ทั้ง 11 ไฟล์ครบ
+- `verify_checkout.py` ผ่านก่อนติดตั้ง; runtime manifest และ model parity 20 แถวผ่าน
+- ทำนายจริง 12 ตัวอย่าง (normal 6 / alert 6), HTTP/export/SQLite/คำถาม 4 แบบ/citations
+  และเปิด session ใหม่โดยประวัติยังอยู่ ผ่าน `deploy/smoke.py`
+- Windows/Python 3.12.14: 35 tests รวม 34 ผ่าน และข้าม ARM64 installer 1 test ตาม platform
+- Browser ที่เชื่อม backend จาก remote clone ผ่าน normal/alert/detail/history/pagination/
+  ดาวน์โหลดผล/คำถาม/ข้อมูลระบบ ทั้ง 800×480 และ 390×844 ไม่มี console error/external requests
+- README ระบุ branch ที่ต้อง clone, รายการ model files และวิธีเปิดด้วย `setup_pi.py`/
+  `start_pi.py` ไม่ต้อง train โมเดล ML หรือมี LLM เพื่อเปิดเดโมหลัก
+
+ผลรอบนี้เป็น Windows fresh-clone verification; Docker Desktop บน host เปิด engine
+ไม่สำเร็จจาก IPC startup error จึงไม่ได้รันทดสอบ ARM64 ซ้ำในรอบเผยแพร่นี้ ไม่ reset
+Docker หรือแก้ระบบเครื่องเพื่อให้ผลดูผ่าน ผล ARM64/QEMU เดิมด้านล่างยังเก็บแยกไว้
+และยังตั้ง `hardware_acceptance_verified=false` จนกว่าจะตรวจ Pi จริง
+
+ผลดิบเฉพาะเครื่องอยู่ ignored `evidence/remote-checkout-verified.json`,
+`remote-benchmark.json`, `remote-tests.log`, `remote-smoke.json`, `remote-git-browser.json`
+ไม่ส่ง telemetry, GGUF, venv, credentials หรือรายงาน device paths ส่วนตัวเข้า Git
+
 ## สถานะล่าสุดของชุดเตรียม Pi
 
 หน้าเว็บปรับภาษาไทยให้อ่านง่ายแล้ว ปุ่มและผลประเมินใช้คำทั่วไป คำตอบจากบันทึกและ
