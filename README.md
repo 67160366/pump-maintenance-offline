@@ -8,7 +8,55 @@ CSV → ตรวจอินพุต → ML classifier → สถานะแ�
                                                     └─ LLM ในเครื่องผ่าน llama.cpp (ทางเลือก)
 ```
 
-**สถานะ:** เทรนและทดสอบบนคอมพิวเตอร์แล้ว ยังไม่ได้ยืนยันประสิทธิภาพบน Pi, LLM GGUF จริง หรือปั๊มจริง โมเดลจำแนก snapshot ไม่ทำนายเวลาที่จะเสีย
+**สถานะ:** โมเดลและ dashboard ผ่านการทดสอบ PC และ Linux ARM64 จำลองแล้ว มีรายงานการทดลองโมเดลบน Pi จากรอบก่อน แต่ยังไม่ผ่านการตรวจรับ Pi แบบถอดเครือข่ายหรือปั๊มจริง โมเดลจำแนก snapshot ไม่ทำนายเวลาที่จะเสีย
+
+เริ่มที่ [ศูนย์รวมเอกสาร](docs/README.md) และ [คู่มือ clone ลง Pi / จำลอง ARM64](docs/PI_READY.md)
+คำสั่งติดตั้งหลักเมื่อมี Python 3.12 บน Pi แล้วคือ `python3.12 setup_pi.py`
+จากนั้น `.venv/bin/python start_pi.py` ใช้ template ได้ทันทีโดยไม่ต้องมี LLM
+
+## Clone ลง Pi แล้วเปิดใช้ — ไม่ต้องเทรน
+
+ชุดส่งต่อนี้อยู่บน branch **`codex/pi-ready-environment`** ให้ clone branch นี้โดยตรง
+เพื่อให้ได้ installer และหน้าเว็บล่าสุด (ไม่ต้อง merge ก่อนนำไปลอง)
+ต้องใช้ Raspberry Pi OS **64-bit / ARM64**, Python **3.12** และ Git
+บน Pi ไม่ต้องติดตั้ง Docker, Node.js หรือ npm
+
+```bash
+git clone --branch codex/pi-ready-environment --single-branch https://github.com/67160366/pump-maintenance-offline.git
+cd pump-maintenance-offline
+python3.12 verify_checkout.py
+python3.12 setup_pi.py
+.venv/bin/python deploy/smoke.py
+.venv/bin/python start_pi.py
+```
+
+เปิด browser บน Pi ที่ **http://127.0.0.1:8080** กด “ดูรายการถัดไป” หรือ “ดูอัตโนมัติ”
+มีข้อมูลตัวอย่าง 12 รายการและโมเดลที่เทรนแล้วพร้อมใช้ คำถามใช้ข้อมูลในเครื่องพร้อม
+บันทึกอ้างอิงเป็นค่าเริ่มต้น จึงใช้งานได้โดยไม่ต้องมี LLM
+
+**โมเดล ML อยู่ใน Git เป็นไฟล์จริง ไม่ใช่ลิงก์ให้ไปเทรนเอง:**
+
+| ไฟล์ | บทบาท |
+| --- | --- |
+| `runtime/model.joblib` | โมเดลหลักที่ dashboard โหลดอัตโนมัติ ขนาด 484,534 bytes |
+| `ai4i-artifacts/ordered_primary/model.joblib` | ต้นฉบับโมเดลหลัก พร้อมรายงานและ parity |
+| `ai4i-artifacts/random_secondary/model.joblib` | โมเดลเปรียบเทียบชุดรอง |
+| `artifacts/model.joblib` | โมเดลชุดปั๊มเดิม ใช้สาธิตข้อจำกัด |
+| `experiments/candidate.joblib` | โมเดลจากการทดลอง ไม่ใช้แทนโมเดลหลัก |
+
+ยังมี `runtime/demo.csv`, threshold, parity, checksums, ข้อมูลสาธารณะและ ARM64 wheels
+ครบ 11 packages `verify_checkout.py` ตรวจ bytes/hash ของโมเดลทั้ง 5 ไฟล์ ข้อมูล และ
+wheels ด้วย Python มาตรฐานก่อนติดตั้ง `setup_pi.py` ตรวจซ้ำก่อนสร้าง environment
+แล้วติดตั้งจาก wheels ใน repo ด้วย `--no-index` และตรวจโหลดโมเดล/ผล parity จริง
+
+ถ้าแจ้งว่าโมเดลหาย ให้หยุดและตรวจ branch/clone ไม่ต้องสั่ง train และห้ามแก้ threshold
+หรือ metadata ให้ผ่าน หากไม่มี Python 3.12 ให้เตรียมตาม [คู่มือ Pi](docs/PI_HANDOFF.md)
+ขณะยังออนไลน์ก่อน การ clone ต้องใช้อินเทอร์เน็ต; เดโมหลักหลังติดตั้งแล้วไม่ใช้
+
+**LLM เป็นอีกส่วนหนึ่ง:** GGUF และ llama.cpp ไม่รวมใน Git ตามขอบเขตโปรเจกต์
+ถ้าจะเปิดตัวเลือกนี้ ให้เตรียมขณะออนไลน์ด้วย `bash deploy/provision-llm.sh`
+สคริปต์มีรุ่น/hash ของ Qwen2.5 0.5B ที่แน่นอนและ reuse ไฟล์เดิมได้ ไม่มีการเทรน LLM
+ผล LLM บน Pi จริงยังต้องตรวจแยก รายละเอียดอยู่ใน [PI_READY](docs/PI_READY.md)
 
 ## นำไปเดโมบน Pi 4 / agent เริ่มตรงนี้
 
@@ -33,12 +81,10 @@ CSV → ตรวจอินพุต → ML classifier → สถานะแ�
 บน Pi ที่มี Python 3.12 แล้ว:
 
 ```bash
-git clone https://github.com/67160366/pump-maintenance-offline.git
+git clone --branch codex/pi-ready-environment --single-branch https://github.com/67160366/pump-maintenance-offline.git
 cd pump-maintenance-offline
-python3.12 -m venv .venv
-.venv/bin/python -m pip install --no-index --find-links wheels/pi4-cp312 -r requirements-pi.txt
-.venv/bin/python pi_check.py
-.venv/bin/python dashboard.py
+python3.12 setup_pi.py
+.venv/bin/python start_pi.py
 ```
 
 เปิด `http://127.0.0.1:8080` หาก Pi ยังไม่มี Python 3.12 ดู [วิธีเตรียม Python](docs/PI_HANDOFF.md)
@@ -73,7 +119,7 @@ AI4I มีเครื่องเสียเพียง 339/10,000 แถว
 ใช้ **Python 3.12** ให้ตรง runtime ที่แนบมา โดย environment ที่ทดสอบจริงเป็น Python 3.12
 
 ```powershell
-git clone https://github.com/67160366/pump-maintenance-offline.git
+git clone --branch codex/pi-ready-environment --single-branch https://github.com/67160366/pump-maintenance-offline.git
 cd pump-maintenance-offline
 py -3.12 -m venv .venv
 .venv\Scripts\python -m pip install -r requirements-pi.txt
@@ -111,9 +157,9 @@ py -3.12 -m venv .venv
 
 ใช้ได้โดยไม่ต้องมี LLM: โปรแกรมแสดงสถานะ ตัวเลข และข้อความไทยจาก template โดยตรง
 
-ทางเลือก LLM ใช้ **Qwen3-0.6B GGUF Q8_0 + llama.cpp** ผ่าน subprocess ในเครื่อง ไม่มีการเรียกบริการภายนอกหรือดาวน์โหลดใน `predict`/`replay` ดาวน์โหลดไฟล์และเตรียม runtime ไว้ล่วงหน้า
+ชุดเตรียม Pi ปัจจุบันเลือก **Qwen2.5-0.5B-Instruct GGUF Q4_K_M + llama.cpp** ให้ตรงกับโมเดลเดิมบน Pi มี commit/revision/hash ใน `deploy/pi-lock.json` เตรียมด้วย `bash deploy/provision-llm.sh` ขณะออนไลน์ แล้วเปิดด้วย `.venv/bin/python start_pi.py --llm` ดูผลทดสอบและข้อจำกัดใน [PI_READY](docs/PI_READY.md)
 
-LLM รุ่นนี้เลือกข้อความที่ตรวจสอบได้ A/B ข้อเท็จจริงยังสร้างจาก template ใช้ `/no_think`, context 1024, output ไม่เกิน 128 tokens และ fallback เมื่อเกิน 30 วินาทีหรือคำตอบไม่ถูกต้อง จึงยังไม่ใช่แชตวิเคราะห์หรือวินิจฉัยสาเหตุอย่างอิสระ
+LLM เลือกข้อความที่ตรวจสอบได้ A/B ข้อเท็จจริงยังสร้างจาก template ใช้ context 1024, output ไม่เกิน 128 tokens และ fallback เมื่อเกิน 30 วินาทีหรือคำตอบไม่ถูกต้อง adapter สำหรับ Qwen2.5 ใช้ explicit ChatML และตัด `/no_think` ที่ไม่ใช่คำสั่งของรุ่นนี้ จึงยังไม่ใช่แชตวิเคราะห์หรือวินิจฉัยสาเหตุอย่างอิสระ
 
 ## โครงสร้าง
 
@@ -144,4 +190,4 @@ virtual environment, credentials, log และ ZIP ที่สร้างซ�
 
 - [AI4I 2020 — UCI](https://archive.ics.uci.edu/dataset/601/ai4i%2B2020%2Bpredictive%2Bmaintenance%2Bdataset): CC BY 4.0. Credit: AI4I 2020 Predictive Maintenance Dataset, UCI Machine Learning Repository, DOI [10.24432/C5HS5C](https://doi.org/10.24432/C5HS5C).
 - [Large Industrial Pump Maintenance Dataset — Kaggle](https://www.kaggle.com/datasets/selonamaris/large-industrial-pump-maintenance-dataset): ตรวจเงื่อนไขปัจจุบันกับผู้จัดทำก่อนเผยแพร่ข้อมูลซ้ำ
-- [llama.cpp](https://github.com/ggml-org/llama.cpp) และ [Qwen3-0.6B GGUF](https://huggingface.co/Qwen/Qwen3-0.6B-GGUF): ใช้ตามเงื่อนไขของแต่ละโครงการ
+- [llama.cpp](https://github.com/ggml-org/llama.cpp) และ [Qwen2.5-0.5B-Instruct GGUF](https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF): ใช้ตามเงื่อนไขของแต่ละโครงการ

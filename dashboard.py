@@ -49,23 +49,23 @@ class ReplayController:
                 self.running = self.pending = False
             elif action == 'reset':
                 if self.busy or self.pending:
-                    raise ValueError('รอแถวปัจจุบันประมวลผลเสร็จก่อนเริ่มใหม่')
+                    raise ValueError('รอให้ระบบดูรายการนี้เสร็จก่อน แล้วกด “เริ่มรอบใหม่” ได้เลย')
                 self.running = False
                 self.position, self.current, self.history, self.error = 0, None, [], None
                 self.session = uuid.uuid4().hex
             elif action in {'start', 'step'}:
                 if self.error:
-                    raise ValueError('แก้สาเหตุที่แสดงและกดเริ่มใหม่ก่อน')
+                    raise ValueError('แก้ปัญหาตามข้อความที่แสดง แล้วกด “เริ่มรอบใหม่”')
                 if self.position >= len(self.inference.frame):
-                    raise ValueError('เล่นครบแล้ว กดเริ่มใหม่เพื่อเล่นอีกครั้ง')
+                    raise ValueError('ดูครบแล้ว กด “เริ่มรอบใหม่” เพื่อดูอีกครั้งได้เลย')
                 if action == 'step' and (self.busy or self.pending or self.running):
-                    raise ValueError('หยุดเล่นอัตโนมัติและรอแถวปัจจุบันก่อน')
+                    raise ValueError('กด “พักการอ่าน” แล้วรอให้ระบบดูรายการนี้เสร็จก่อน')
                 if action == 'start':
                     self.running = True
                 else:
                     self.pending = True
             else:
-                raise ValueError('Unknown action')
+                raise ValueError('ไม่พบคำสั่งนี้ กรุณาเลือกจากปุ่มบนหน้าจอ')
             self.wake.set()
 
     def progress(self, event):
@@ -110,7 +110,7 @@ class ReplayController:
     def ask(self, question, scope='session'):
         with self.lock:
             if self.busy or self.pending or self.running or self.ask_busy:
-                raise ValueError('หยุดเดโมและรอแถวปัจจุบันเสร็จก่อนถามข้อมูล')
+                raise ValueError('พักการอ่านข้อมูลและรอให้ระบบทำรายการนี้เสร็จก่อน แล้วถามได้เลย')
             self.ask_busy = True
             session = self.session
         try:
@@ -145,7 +145,9 @@ def handler_for(controller):
             self.wfile.write(data)
 
         def do_GET(self):
-            if self.path == '/api/state':
+            if self.path == '/favicon.ico':
+                self.send(204, b'', 'image/x-icon')
+            elif self.path == '/api/state':
                 self.send(200, controller.snapshot())
             elif self.path == '/api/export':
                 self.send(200, controller.snapshot())

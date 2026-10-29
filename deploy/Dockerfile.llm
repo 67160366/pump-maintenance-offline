@@ -1,0 +1,6 @@
+# Provisioning image only; deploy/Dockerfile.pi is the offline-first ARM64 check.
+FROM pump-pi-arm64:local
+RUN apt-get update && apt-get install -y --no-install-recommends git cmake build-essential ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+ENV PYTHON=/opt/pump-venv/bin/python
+CMD ["sh", "deploy/provision-llm.sh"]

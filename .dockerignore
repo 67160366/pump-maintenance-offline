@@ -1,0 +1,11 @@
+.git
+.venv
+local
+models
+evidence
+pi-release*
+__pycache__
+*.zip
+*.log
+*.sqlite3*
+PUMP_MAINTENANCE_RESULTS.md

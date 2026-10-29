@@ -1,0 +1,24 @@
+#!/usr/bin/env python3
+"""App CLI -> pinned llama-completion, explicit Qwen2.5 ChatML, stdout unmodified.
+
+exec preserves timeouts: the application terminates the actual inference process.
+No output scraping or accepting text around a malformed answer.
+"""
+import os
+import sys
+from pathlib import Path
+
+build = os.environ.get('LLAMA_LOCAL_BUILD', 'build')
+if build not in {'build', 'build-cross'}:
+    raise SystemExit('LLAMA_LOCAL_BUILD must be build or build-cross')
+binary = Path(__file__).resolve().parents[1]/'local/llama.cpp'/build/'bin/llama-completion'
+args = sys.argv[1:]
+if '-p' not in args:
+    raise SystemExit('Expected -p prompt')
+index = args.index('-p') + 1
+args[index] = ('<|im_start|>system\nYou select exactly one allowed answer. Follow the requested output format.'
+               '<|im_end|>\n<|im_start|>user\n' + args[index].removeprefix('/no_think\n') +
+               '<|im_end|>\n<|im_start|>assistant\n')
+args = [arg for arg in args if arg != '--single-turn']
+args += ['--no-conversation', '--no-warmup', '--log-verbosity', '0', '--simple-io', '--temp', '0', '--seed', '42']
+os.execv(str(binary), [str(binary), *args])

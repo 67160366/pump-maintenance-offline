@@ -1,6 +1,6 @@
 # สิ่งที่ clone แล้วได้ทันที
 
-อัปเดต 27 ตุลาคม 2026 ตามคำขอให้เผยแพร่ไฟล์ที่มีอยู่ครบสำหรับนำไปใช้บน Pi
+ชุดส่งต่อใช้ branch `codex/pi-ready-environment` ตามคำขอให้เผยแพร่ไฟล์ที่มีอยู่ครบสำหรับนำไปใช้บน Pi
 `.gitignore` เดิมกัน models/data/artifacts/wheels ทั้งหมด ตอนนี้เปิดเฉพาะรายการที่ใช้จริง
 
 | ใน Git | หน้าที่ |
@@ -20,8 +20,8 @@
 
 - `.venv/`, `__pycache__/`: ต้องสร้าง environment ให้ตรง OS/CPU เป้าหมาย
 - `.env*`, `*.pem`, `*.key`: credentials ของเครื่อง ไม่ใช่ส่วนหนึ่งของเดโม
-- `models/`, `*.gguf`, `*.pkl`: ยังไม่มี GGUF/llama.cpp ที่เตรียมจริงใน workspace;
-  `.pkl` จากงานภายนอกไม่ได้ใช้กับระบบนี้
+- `models/`, `local/`, `*.gguf`, `*.pkl`: GGUF/llama.cpp เป็น provisioning ทางเลือกตาม
+  `deploy/pi-lock.json` ไม่จำเป็นสำหรับเดโมหลัก; `.pkl` จากงานภายนอกไม่ได้ใช้กับระบบนี้
 - `*.zip`, `pi-release*/`: archive สร้างซ้ำจากโค้ด/โมเดลที่ติด Git ได้
   ZIP งานภายนอกที่ตรวจ target leakage ไม่ใช่ dependency ของระบบ
 - `reviews/`, `evidence/`, logs, JSONL, benchmark output: งานชั่วคราวและผลเฉพาะเครื่อง
@@ -33,6 +33,11 @@
 ทำตาม `docs/PI_HANDOFF.md` ข้อ 0 ค่าเริ่มต้น `python dashboard.py` และ `python pi_check.py`
 ใช้ `runtime/` ตรวจ hash/versions ให้ก่อน ไม่มีการ train/download ระหว่าง inference
 โหมด template ไม่ต้องใช้ LLM หากต้องการ LLM ให้เตรียม GGUF/llama.cpp ตามคู่มือข้อ 4
+
+เริ่มตรวจด้วย `python3.12 verify_checkout.py` โดยยังไม่ต้องติดตั้ง packages
+สคริปต์ตรวจว่าโมเดลเป็นไฟล์จริง ไม่ใช่ Git LFS pointer พร้อม checksums ใน
+`deploy/checkout-assets.json` (5 model files + 2 public datasets), runtime manifest
+และ `deploy/wheels-sha256.json` (11 wheels) ถ้าขาดให้แก้ clone ไม่ใช่เทรนบน Pi
 
 `.gitattributes` รักษา bytes ของ `runtime/`, CSV, joblib และ wheels เพื่อให้ hash ตรงกัน
 ทั้ง Windows และ Linux ตรวจไฟล์สำคัญที่ควรติด Git ด้วย:

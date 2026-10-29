@@ -137,13 +137,13 @@ def answer(store, session, dataset, question, args, scope='session', use_llm=Fal
     # Exact counts are computed over the full SQL scope, never a truncated LLM context.
     stats = store.stats(dataset, session, scope)
     today = any(word in question.casefold() for word in ('วันนี้', 'today'))
-    scope_label = 'รอบเดโมนี้' if scope == 'session' else 'ทั้งหมดที่บันทึกในชุดข้อมูลนี้'
-    caveat = ('AI4I สังเคราะห์ไม่มีรหัสเครื่องจริง; แต่ละแถวคือ snapshot'
-              if dataset == 'ai4i' else 'ปั๊มเดิมยังไม่ชนะ baseline; หน่วยอุณหภูมิยังไม่ยืนยัน')
+    scope_label = 'ข้อมูลรอบนี้' if scope == 'session' else 'ทั้งหมดที่บันทึกในชุดข้อมูลนี้'
+    caveat = ('ข้อมูลจำลองนี้ไม่มีรหัสเครื่องจริง แต่ละรายการเป็นเพียงตัวอย่างสำหรับทดลอง'
+              if dataset == 'ai4i' else 'ผลทำนายของชุดปั๊มนี้ยังไม่น่าเชื่อถือเพียงพอ และยังไม่ยืนยันหน่วยอุณหภูมิ')
     base = dict(scope=scope, scope_label=scope_label, caveat=caveat, stats=stats,
                 citations=[], method='local_data_query', llm_seconds=0.0)
     if today and (dataset == 'ai4i' or stats['timestamped'] == 0):
-        return dict(base, intent='time_unavailable', answer='ยังระบุเครื่องของวันนี้ไม่ได้: ไม่มีเวลาวัดจริง\nเวลาบันทึก replay เป็นคนละเวลากับเวลาวัด\nลองถาม “รายการเตือนในรอบนี้” แทน')
+        return dict(base, intent='time_unavailable', answer='ยังบอกไม่ได้ว่าเครื่องไหนมีปัญหาวันนี้ เพราะข้อมูลไม่มีเวลาที่วัดจริง\nเวลาที่บันทึกตัวอย่างเป็นคนละเวลากับเวลาวัด\nลองถาม “รายการเตือนในรอบนี้” แทนได้')
     if today:
         scope_label = 'เวลาวัดวันนี้ (Asia/Bangkok) · ' + scope_label
         stats = store.stats(dataset, session, scope, today=True)
@@ -151,24 +151,24 @@ def answer(store, session, dataset, question, args, scope='session', use_llm=Fal
     intent, method, elapsed = route_question(question, args, use_llm)
     base.update(intent=intent, method=method, llm_seconds=elapsed)
     if intent == 'unknown':
-        return dict(base, answer='ถามได้เรื่องสรุปข้อมูล รายการที่โมเดลเตือน อุณหภูมิสูงสุด หรือค่าล่าสุด ระบบยังไม่วินิจฉัยสาเหตุหรือทำนายเวลาที่จะเสีย')
+        return dict(base, answer='ลองถามว่า “สรุปข้อมูล” “มีรายการเตือนอะไรบ้าง” “อุณหภูมิสูงสุด” หรือ “ค่าล่าสุด” ได้เลย\nตอนนี้ยังบอกสาเหตุหรือเวลาที่เครื่องจะเสียไม่ได้')
     if not stats['total']:
-        return dict(base, answer='ยังไม่มีข้อมูลในช่วงที่เลือก กดอ่านข้อมูลหรือเล่นเดโมก่อน แล้วถามอีกครั้งได้')
+        return dict(base, answer='ยังไม่มีข้อมูลในช่วงที่เลือก ไปที่ “ภาพรวม” แล้วกด “ดูรายการถัดไป” หรือ “ดูอัตโนมัติ” ก่อน จากนั้นกลับมาถามได้เลย')
     rows = store.read(dataset, session, scope, intent, today=today, limit=3)
     lines = []
     if intent == 'summary':
-        lines.append(f"มี {stats['total']} บันทึก: โมเดลเตือน {stats['alerts']}, ยังไม่พบสัญญาณ {stats['normal']}, ประเมินไม่ได้ {stats['missing']}")
+        lines.append(f"มี {stats['total']} รายการ: ควรตรวจสอบ {stats['alerts']}, ไม่พบสัญญาณเตือน {stats['normal']}, ประเมินไม่ได้ {stats['missing']}")
     elif intent == 'alerts':
-        lines.append(f"โมเดลเตือน {stats['alerts']} บันทึก (ยังไม่ใช่การยืนยันว่าเสีย)")
+        lines.append(f"พบ {stats['alerts']} รายการที่ควรตรวจสอบเพิ่มเติม (ยังไม่ได้ยืนยันว่าเครื่องเสีย)")
     elif intent == 'temperature':
-        lines.append('อุณหภูมิสูงสุดจากข้อมูล • ยังไม่มีเกณฑ์ยืนยันว่า “ร้อนเกิน”'
-                     if rows else 'ไม่มีค่าอุณหภูมิครบถ้วนในช่วงที่เลือก จึงยังจัดอันดับไม่ได้')
+        lines.append('อุณหภูมิสูงสุดในข้อมูลที่เลือก • ยังไม่มีเกณฑ์บอกว่าร้อนเกินไป'
+                     if rows else 'ยังไม่มีค่าอุณหภูมิในช่วงที่เลือก จึงบอกค่าสูงสุดไม่ได้')
     else:
         lines.append('ข้อมูลล่าสุดที่บันทึกไว้:')
     for row in rows:
-        identity = f"ปั๊ม {row['machine_id']}" if row.get('machine_id') else f"snapshot แถว {row['row']}"
+        identity = f"ปั๊ม {row['machine_id']}" if row.get('machine_id') else f"รายการที่ {row['row']}"
         detail = (f"{row['temperature']:.2f} {row['temperature_unit']}" if intent == 'temperature'
-                  else ('โมเดลเตือน' if row['status'] == 1 else 'ยังไม่พบสัญญาณ' if row['status'] == 0 else 'ประเมินไม่ได้'))
+                  else ('ควรตรวจสอบ' if row['status'] == 1 else 'ไม่พบสัญญาณเตือน' if row['status'] == 0 else 'ประเมินไม่ได้'))
         lines.append(f"• {identity}: {detail} [#{row['record_id']}]")
         base['citations'].append(dict(record_id=row['record_id'], row=row['row'], machine_id=row.get('machine_id'),
                                       recorded_at=row['at'], measured_at=row.get('measured_at'),

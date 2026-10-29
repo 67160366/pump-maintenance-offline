@@ -1,5 +1,16 @@
 # ส่งงานให้ agent บน Raspberry Pi 4
 
+หน้าเว็บใช้ภาษาไทยแบบง่ายแล้ว: “ดูรายการถัดไป”, “ดูอัตโนมัติ”, “พักการอ่าน” และ
+“เริ่มรอบใหม่” (ไม่ลบประวัติ) รายละเอียดเทคนิคเปิดจาก “ข้อมูลเพิ่มเติมสำหรับผู้ดูแล”
+อ่าน [รูปแบบหน้าจอ](PI_SCREEN_DESIGN.md) สำหรับความหมายและผลตรวจ UI ล่าสุด
+
+เส้นทางติดตั้งปัจจุบัน: อ่าน [PI_READY.md](PI_READY.md) ก่อน ใช้ `python3.12 setup_pi.py`
+เพื่อตรวจ wheels/install/parity และ `.venv/bin/python start_pi.py` เพื่อเปิด template
+LLM profile ปัจจุบันคือ Qwen2.5-0.5B-Instruct Q4_K_M + llama-completion ที่ pin ใน
+`deploy/pi-lock.json` ใช้ `bash deploy/provision-llm.sh` แล้ว `start_pi.py --llm`
+คำสั่ง Qwen3 ในข้อ 4 ด้านล่างเป็นทางเลือกเดิม ไม่ใช่ profile ที่ทดสอบในงานเตรียมล่าสุด
+ผล ARM64 จำลองอ่านแยกจากผล Pi จริงใน [สถานะปัจจุบัน](PROJECT_STATUS.md)
+
 เป้าหมายแรก: **เปิด dashboard + เล่น CSV ด้วยโมเดลจริงและ template โดยตัดอินเทอร์เน็ต**
 เป้าหมายถัดมา: ทำแบบเดียวกันโดยมี llama.cpp/GGUF จริง พร้อมหลักฐาน fallback
 
@@ -13,14 +24,13 @@ Python ที่มากับ OS อาจเป็นคนละรุ่น
 หากไม่มี 3.12 ให้เตรียมขณะออนไลน์ด้วย uv ตามข้อ 2 ด้านล่าง
 
 ```bash
-git clone https://github.com/67160366/pump-maintenance-offline.git
+git clone --branch codex/pi-ready-environment --single-branch https://github.com/67160366/pump-maintenance-offline.git
 cd pump-maintenance-offline
-python3.12 -m venv .venv
-.venv/bin/python -m pip install --no-index --find-links wheels/pi4-cp312 -r requirements-pi.txt
-.venv/bin/python -m pip check
-.venv/bin/python pi_check.py --output evidence/pi-preflight.json
+python3.12 verify_checkout.py
+python3.12 setup_pi.py
 .venv/bin/python -m unittest -v
-.venv/bin/python dashboard.py
+.venv/bin/python deploy/smoke.py
+.venv/bin/python start_pi.py
 ```
 
 ถ้าใช้ uv: `uv venv --python 3.12 --seed .venv` แทนคำสั่งสร้าง venv

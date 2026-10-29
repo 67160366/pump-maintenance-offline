@@ -1,0 +1,8 @@
+# ARM64 user-space emulation, not a Pi kernel, hardware or performance simulation.
+FROM python:3.12.14-slim-bookworm@sha256:392307d22300de8b5986851a12d9176dfc0fc073e65bf6523ebd7dcbeb23564e
+ENV OMP_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2 PYTHONUNBUFFERED=1
+WORKDIR /app
+COPY . /app
+RUN python setup_pi.py --venv /opt/pump-venv
+ENV PATH="/opt/pump-venv/bin:$PATH"
+CMD ["python", "pi_check.py", "--benchmark", "--output", "evidence/arm64-template.json"]

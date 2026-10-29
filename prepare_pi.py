@@ -73,8 +73,10 @@ def prepare(args):
     if demo.empty:
         raise ValueError('No demo snapshots available')
     out.mkdir(parents=True)
-    for pattern in ('*.py', '*.md', 'requirements.txt'):
+    for pattern in ('*.py', '*.md', 'requirements.txt', '.dockerignore', '.gitattributes', '.gitignore'):
         for path in source.glob(pattern):
+            if path.name == 'PUMP_MAINTENANCE_RESULTS.md':
+                continue  # Local imported device notes are not a release input.
             shutil.copy2(path, out/path.name)
     for name in ('docs', 'web', 'deploy'):
         shutil.copytree(source/name, out/name)
