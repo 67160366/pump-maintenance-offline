@@ -8,3 +8,7 @@
 *.whl binary
 # Preserve exact runtime bytes so manifest hashes survive Windows/Linux checkout.
 runtime/** -text
+# Linux launchers must survive a Windows checkout / ZIP transfer.
+*.sh text eol=lf
+deploy/llama-local text eol=lf
+Dockerfile* text eol=lf

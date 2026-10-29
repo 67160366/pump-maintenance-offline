@@ -1,4 +1,70 @@
-# สถานะและงานถัดไป — 28 ตุลาคม 2026
+# สถานะและงานถัดไป
+
+## สถานะล่าสุดของชุดเตรียม Pi
+
+หน้าเว็บปรับภาษาไทยให้อ่านง่ายแล้ว ปุ่มและผลประเมินใช้คำทั่วไป คำตอบจากบันทึกและ
+ข้อความแนะนำเมื่อยังไม่มีข้อมูลปรับตามด้วย รายละเอียดเทคนิคเปิดเพิ่มได้เฉพาะเมื่อสนใจ
+Browser 800×480/390×844 ผ่านดู normal/alert, อัตโนมัติ 12 แถว, ประวัติ/แบ่งหน้า,
+ดาวน์โหลดผล, คำถาม/อ้างอิง/ไม่มีข้อมูล และหน้าอธิบายระบบ ไม่มี console error
+API/UI tests ที่เกี่ยวข้องผ่าน 16 tests; ไม่เปลี่ยนโมเดล threshold schema หรือ LLM prompt
+รายละเอียด: [รูปแบบหน้าจอ](PI_SCREEN_DESIGN.md)
+ชุดย้ายไป Pi ที่รวมหน้าเว็บภาษาไทยล่าสุดคือ `pi-release-thai-ui.zip` พร้อม ARM64 wheels
+และ parity 20 แถวผ่าน ส่วน `pi-release-ready.zip` เป็น snapshot ชุดฐานก่อนปรับคำบน UI
+
+เริ่มที่ [ศูนย์รวมเอกสาร](README.md) และ [PI_READY](PI_READY.md)
+มี installer แบบ offline-first, launcher, pinned LLM provisioning, wheel checksums,
+ARM64 Docker/QEMU และสคริปต์ smoke ผ่าน HTTP/SQLite พร้อมแล้วใน working branch
+ชุดส่งต่อใช้ branch `codex/pi-ready-environment` และคำสั่ง clone ใน README ระบุ branch นี้
+`verify_checkout.py` ตรวจโมเดลจริงทั้ง 5 ไฟล์, ข้อมูลสาธารณะ, runtime manifest และ
+wheels 11 ไฟล์ก่อนติดตั้ง ถ้าขาด/เสียหาย/เป็น LFS pointer จะหยุดโดยไม่เทรนบน Pi
+
+ก่อนส่ง Git ตรวจ bytes จาก staged Git tree โดยตรง: โมเดลหลัก 484,534 bytes,
+โมเดลทั้ง 5 ไฟล์และ wheels ทั้ง 11 ไฟล์ hash ตรง ไม่มี telemetry/venv/GGUF/credentials
+ในชุดส่ง ทดสอบไฟล์ที่ export จาก Git tree ไปโฟลเดอร์ใหม่ด้วย model parity 20 แถว
+และ HTTP/SQLite smoke 12 แถวผ่าน Windows tests รวม 35 tests ผ่าน (ข้าม ARM64 installer
+1 test ตาม platform) ผล ARM64/QEMU ด้านล่างเป็นหลักฐานรอบก่อน ไม่ใช้แทน Pi จริง
+
+- Linux ARM64 จำลอง / Python 3.12.14: install wheels ทั้ง 11 packages โดยไม่ใช้ index,
+  `pip check` และ model parity 20 แถว atol=1e-9 ผ่าน
+- Template ผ่าน replay 12 แถว (normal 6 / alert 6), export, คำถาม 4 intents พร้อม citation,
+  ไม่แต่งเวลาวัด และ restart แล้วประวัติ SQLite ยังคงอยู่ ใน container `--network none`
+- ชุดทดสอบเดิม 31 tests ผ่านทั้ง Windows และ ARM64 จำลอง มี SciPy `iprint` warning เดิม
+- Browser บน PC เชื่อม ARM64 backend: 800×480, normal/alert/history/ask/citation ผ่าน,
+  ไม่มี horizontal overflow, ไม่มี console error หรือ external request
+- ML ยังคง `forest_physics_12` / ordered_primary / threshold เดิม; ไม่เทรนหรือปรับคะแนน
+- Qwen2.5 0.5B Q4_K_M เป็น LLM profile สำหรับเตรียมใช้งาน ไม่ใช่หลักฐาน Pi acceptance
+- Build executable ARM64 และ real GGUF raw probes ผ่าน `A` / `summary` หลังแก้ stdout
+  แต่ application บน QEMU timeout summary 2/2 และ question 4/4 ตาม deadline 30s/10s
+  actual executable-failure fallback ผ่าน ยังต้องยืนยัน performance บน Pi ไม่ประกาศ LLM acceptance
+- รายละเอียดการจำลอง ข้อจำกัด และ compatibility patch: [ผลเตรียม Pi](PI_ENVIRONMENT_RESULTS.md)
+- ZIP `pi-release-ready.zip` ผ่าน fresh Linux directory/venv + offline setup + smoke 12 แถว
+  + launcher + generate service file แล้ว ไม่รวม venv/GGUF/SQLite/บันทึกเครื่องส่วนตัว
+
+หลักฐานส่วนตัว `evidence/arm64-ready-smoke.json`, `arm64-template.json`,
+`arm64-browser.json` และ PNG อยู่ ignored; ผลจำลองไม่ใช้แทน timing/thermal ของ Pi
+`hardware_acceptance_verified=false` และไม่ได้ทดสอบเซนเซอร์/ปั๊มจริง
+
+## ผล Pi จริงจากรายงานรอบก่อน
+
+รายงานที่ผู้ใช้นำมาให้อ่านระบุ Pi 4 ARM64/Python 3.12.16, parity 20 แถวผ่าน,
+benchmark 2 snapshots (normal/alert), ML <1s/แถว, summary <30s, peak system RAM
+1,819,664,384 bytes, อุณหภูมิ 46.251°C และ `throttled=0x0` ตอนตรวจ
+แต่ LLM ถูก guard ปฏิเสธทั้ง summary และ question routing จึงใช้ fallback
+ยังไม่ถอด network จริง ไม่ตรวจ browser บน Pi และยังไม่ผ่าน hardware acceptance
+ข้อมูลนี้เป็นรายงานประวัติ ไม่ใช่ผลตรวจอุปกรณ์สดในเครื่อง Windows รอบนี้
+
+## งานต่อก่อนตรวจรับ
+
+1. ยืนยัน LLM profile ใหม่บน Pi ด้วย GGUF จริง ต้องเห็น validated methods และ fallback
+2. ถอด Wi-Fi/LAN จริงแล้วเก็บ benchmark/thermal พร้อมตรวจจอ Pi normal/alert/คำถาม/export
+3. หลัง manual demo ผ่าน ค่อยสร้าง unit ด้วย `deploy/make_service.py` และตรวจหลัง reboot
+4. ใช้ branch `codex/pi-ready-environment` ตาม README เพื่อให้ได้ชุดส่งต่อและ installer ล่าสุด
+5. ปั๊มจริงต้องกำหนด sensor/schema/หน่วยและข้อมูล label ก่อน ไม่ย้าย AI4I ไปใช้โดยเปลี่ยนชื่อคอลัมน์
+
+## ประวัติการเตรียมบน PC (เก็บไว้แยกจากสถานะล่าสุด)
+
+ข้อความด้านล่างเป็นสถานะและหลักฐานในรอบก่อนเริ่มทดลอง Pi/ARM64 จึงมีข้อความ
+“รอทดสอบ” ที่ไม่ใช่สถานะล่าสุด อ่านส่วนบนสำหรับผลที่มีเพิ่มแล้ว
 
 ## ขอบเขตปัจจุบัน
 

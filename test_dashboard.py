@@ -170,7 +170,7 @@ class DashboardTests(unittest.TestCase):
             return urlopen(Request(base+'/api/action', json.dumps(dict(action=action)).encode(), headers), timeout=3)
         try:
             with urlopen(base) as response:
-                self.assertIn('PUMP LAB', response.read().decode())
+                self.assertIn('ผู้ช่วยดูแลเครื่อง', response.read().decode())
                 self.assertIn("default-src 'self'", response.headers['Content-Security-Policy'])
             with post('step') as response: self.assertEqual(response.status, 200)
             self.wait_position(controller, 1)

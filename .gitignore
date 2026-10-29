@@ -1,5 +1,8 @@
 # Local environments, caches and secrets
 .venv/
+local/
+.local/
+/PUMP_MAINTENANCE_RESULTS.md
 __pycache__/
 *.py[cod]
 .env

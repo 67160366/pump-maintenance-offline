@@ -1,0 +1,10 @@
+{
+  "python_major_minor": "3.12",
+  "llama_cpp_commit": "7df8b876b91208a86a6d792e1140b3deec14535b",
+  "completion_patch": "quiet-eog-v1 (deploy/patch_completion.py)",
+  "model_repo": "Qwen/Qwen2.5-0.5B-Instruct-GGUF",
+  "model_revision": "9217f5db79a29953eb74d5343926648285ec7e67",
+  "model_file": "qwen2.5-0.5b-instruct-q4_k_m.gguf",
+  "model_sha256": "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db",
+  "model_bytes": 491400032
+}
